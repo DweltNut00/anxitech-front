@@ -1,0 +1,40 @@
+{
+  "name": "anxitech-vue",
+  "private": true,
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --fix"
+  },
+  "dependencies": {
+    "@mdi/font": "7.4.47",
+    "@vueuse/core": "^13.0.0",
+    "roboto-fontface": "*",
+    "vue": "^3.5.13",
+    "vuetify": "^3.7.19"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.23.0",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "eslint": "^9.23.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-n": "^17.17.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^7.2.1",
+    "eslint-plugin-vue": "^10.0.0",
+    "pinia": "^3.0.1",
+    "sass": "1.86.0",
+    "sass-embedded": "^1.86.0",
+    "unplugin-auto-import": "^19.1.2",
+    "unplugin-fonts": "^1.3.1",
+    "unplugin-vue-components": "^28.4.1",
+    "unplugin-vue-router": "^0.12.0",
+    "vite": "^6.2.3",
+    "vite-plugin-vue-layouts": "^0.11.0",
+    "vite-plugin-vuetify": "^2.1.0",
+    "vue-router": "^4.5.0"
+  }
+}
