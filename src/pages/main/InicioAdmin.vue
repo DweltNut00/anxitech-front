@@ -26,7 +26,7 @@
       {{ error }}
       <br /><br />
       <strong>Solución:</strong> Verifica que la API esté corriendo en
-      <code>http://localhost:8000</code>
+      <code>https://anxitech-modelo.onrender.com</code>
       <br />
       <v-btn
         size="small"
@@ -993,7 +993,7 @@ const error = ref(null);
 const showDebug = ref(false); // Cambiar a true para ver datos de debug
 
 // API URL - CAMBIA ESTO SI TU API ESTÁ EN OTRO PUERTO
-const API_URL = "http://localhost:8000";
+const API_URL = "https://anxitech-modelo.onrender.com";
 
 // Datos desde la API
 const estadisticas = ref({});
@@ -1254,7 +1254,7 @@ const cargarEvolucion = async () => {
     // Por ahora, simulamos con datos de ejemplo
 
     const response = await fetch(
-      "http://localhost:8000/api/stats/correlaciones",
+      "https://anxitech-modelo.onrender.com/api/stats/correlaciones",
     );
     const data = await response.json();
 
@@ -1303,7 +1303,7 @@ const getImpactColor = (porcentajeAlto) => {
 const cargarCorrelaciones = async () => {
   try {
     const response = await fetch(
-      "http://localhost:8000/api/stats/correlaciones",
+      "https://anxitech-modelo.onrender.com/api/stats/correlaciones",
     );
     const data = await response.json();
     correlaciones.value = data.correlaciones;
@@ -1372,7 +1372,7 @@ const cargarFactores = async () => {
 
   try {
     const response = await fetch(
-      "http://localhost:8000/api/stats/correlaciones",
+      "https://anxitech-modelo.onrender.com/api/stats/correlaciones",
     );
     const data = await response.json();
 
