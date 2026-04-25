@@ -509,6 +509,8 @@ const enviarEncuesta = async () => {
     text.value     = "Ha ocurrido un error.";
     snackbar.value = true;
     dialog.value   = false;
+    console.log('Error detallado:', error); // ← agrega esto
+
   }
 };
 
