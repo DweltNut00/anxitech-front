@@ -538,10 +538,20 @@ const rawResponse = await fetch(
     }
 );
 
-const rawText = await rawResponse.text();
-console.log('Respuesta cruda:', rawText); // ← ver el HTML exacto
 
-const register = JSON.parse(rawText);
+const rawText = await rawResponse.text();
+console.log('Respuesta cruda:', rawText);
+
+// En lugar de JSON.parse, usa esto:
+let register;
+try {
+    register = JSON.parse(rawText);
+} catch(e) {
+    console.log('Error parseando JSON:', rawText);
+    throw e;
+}
+
+
 </script>
 
 <style lang="scss" scoped>
