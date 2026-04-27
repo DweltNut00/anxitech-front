@@ -465,34 +465,35 @@ const enviarEncuesta = async () => {
   try {
     dialog.value = true;
 
-    const register = await (
-      await fetch(
-        import.meta.env.VITE_ENDPOINT + "questions.php?action=registerEncuestaExtra",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id_alumno:           usuarioStore.getId(),
-            id_aplicacion:       usuarioStore.getIdAplicacion(),
-            carrera:             carrera.value,
-            modalidad:           modalidad.value,
-            promedio_anterior:   promedio.value,
-            semestre:            semestre.value,
-            materias:            materias.value,
-            transporte:          transporte.value,
-            familiares:          familiares.value,
-            trabajo:             trabajo.value,
-            beca:                beca.value,
-            maestros_estrictos:  maestros_estrictos.value,
-            tiene_hijos:         tiene_hijos.value,
-            ingreso_mensual:     ingreso_mensual.value,
-            horas_sueno:         horas_sueno.value,
-          }),
-        }
-      )
-    ).json();
+    const rawResponse = await fetch(
+      import.meta.env.VITE_ENDPOINT + "questions.php?action=registerEncuestaExtra",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id_alumno:           usuarioStore.getId(),
+          id_aplicacion:       usuarioStore.getIdAplicacion(),
+          carrera:             carrera.value,
+          modalidad:           modalidad.value,
+          promedio_anterior:   promedio.value,
+          semestre:            semestre.value,
+          materias:            materias.value,
+          transporte:          transporte.value,
+          familiares:          familiares.value,
+          trabajo:             trabajo.value,
+          beca:                beca.value,
+          maestros_estrictos:  maestros_estrictos.value,
+          tiene_hijos:         tiene_hijos.value,
+          ingreso_mensual:     ingreso_mensual.value,
+          horas_sueno:         horas_sueno.value,
+        }),
+      }
+    );
 
-    console.log('Respuesta API:', register); // ← agrega esto
+    const rawText = await rawResponse.text();
+    console.log('Respuesta cruda:', rawText);
+
+    const register = JSON.parse(rawText);
 
     if (register.status != "ok") {
       text.value       = register.message;
@@ -528,28 +529,6 @@ onBeforeMount(async () => {
     router.push({ name: "panel-inicio" });
   }
 });
-
-const rawResponse = await fetch(
-    import.meta.env.VITE_ENDPOINT + "questions.php?action=registerEncuestaExtra",
-    {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({...}),
-    }
-);
-
-
-const rawText = await rawResponse.text();
-console.log('Respuesta cruda:', rawText);
-
-// En lugar de JSON.parse, usa esto:
-let register;
-try {
-    register = JSON.parse(rawText);
-} catch(e) {
-    console.log('Error parseando JSON:', rawText);
-    throw e;
-}
 
 
 </script>
