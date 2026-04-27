@@ -103,7 +103,7 @@ const timeout = ref(2500)
 
 const dialog = shallowRef(false)
 
-const limit = 7;
+const limit = 3;
 const loading = ref(true);
 
 const loadingBtn = ref(false);
