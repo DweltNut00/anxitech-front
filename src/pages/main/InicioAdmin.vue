@@ -1254,7 +1254,7 @@ const cargarEvolucion = async () => {
     // Por ahora, simulamos con datos de ejemplo
 
     const response = await fetch(
-      "https://anxitech-modelo.onrender.com/api/stats/correlaciones",
+      "https://anxitech-model.onrender.com/api/stats/correlaciones",
     );
     const data = await response.json();
 
@@ -1303,7 +1303,7 @@ const getImpactColor = (porcentajeAlto) => {
 const cargarCorrelaciones = async () => {
   try {
     const response = await fetch(
-      "https://anxitech-modelo.onrender.com/api/stats/correlaciones",
+      "https://anxitech-model.onrender.com/api/stats/correlaciones",
     );
     const data = await response.json();
     correlaciones.value = data.correlaciones;
@@ -1372,7 +1372,7 @@ const cargarFactores = async () => {
 
   try {
     const response = await fetch(
-      "https://anxitech-modelo.onrender.com/api/stats/correlaciones",
+      "https://anxitech-model.onrender.com/api/stats/correlaciones",
     );
     const data = await response.json();
 
