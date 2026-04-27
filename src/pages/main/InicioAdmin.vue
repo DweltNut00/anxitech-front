@@ -26,7 +26,7 @@
       {{ error }}
       <br /><br />
       <strong>Solución:</strong> Verifica que la API esté corriendo en
-      <code>https://anxitech-modelo.onrender.com</code>
+      <code>https://anxitech-model.onrender.com</code>
       <br />
       <v-btn
         size="small"
@@ -993,7 +993,7 @@ const error = ref(null);
 const showDebug = ref(false); // Cambiar a true para ver datos de debug
 
 // API URL - CAMBIA ESTO SI TU API ESTÁ EN OTRO PUERTO
-const API_URL = "https://anxitech-modelo.onrender.com";
+const API_URL = "https://anxitech-model.onrender.com";
 
 // Datos desde la API
 const estadisticas = ref({});
