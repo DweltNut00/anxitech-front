@@ -528,6 +528,20 @@ onBeforeMount(async () => {
     router.push({ name: "panel-inicio" });
   }
 });
+
+const rawResponse = await fetch(
+    import.meta.env.VITE_ENDPOINT + "questions.php?action=registerEncuestaExtra",
+    {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({...}),
+    }
+);
+
+const rawText = await rawResponse.text();
+console.log('Respuesta cruda:', rawText); // ← ver el HTML exacto
+
+const register = JSON.parse(rawText);
 </script>
 
 <style lang="scss" scoped>
