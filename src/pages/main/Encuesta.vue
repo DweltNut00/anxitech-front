@@ -116,10 +116,14 @@ const suma = ref(0);
 
 const getEncuesta = async () => {
     const dataJson = await (await fetch(import.meta.env.VITE_ENDPOINT + 'questions.php?action=getEncuesta')).json()
+    
+    console.log('Respuesta API:', dataJson) // ← agrega esto
+    
     loading.value = false;
     items.value = dataJson.data;
 
     if (dataJson.data.length != limit) {
+        console.log('Redirigiendo — preguntas recibidas:', dataJson.data.length, 'esperadas:', limit) // ← y esto
         salir();
     }
 }
