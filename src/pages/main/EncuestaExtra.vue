@@ -492,6 +492,8 @@ const enviarEncuesta = async () => {
       )
     ).json();
 
+    console.log('Respuesta API:', register); // ← agrega esto
+
     if (register.status != "ok") {
       text.value       = register.message;
       snackbar.value   = true;
@@ -509,8 +511,7 @@ const enviarEncuesta = async () => {
     text.value     = "Ha ocurrido un error.";
     snackbar.value = true;
     dialog.value   = false;
-    console.log('Error detallado:', error); // ← agrega esto
-
+    console.log('Error detallado:', error);
   }
 };
 
