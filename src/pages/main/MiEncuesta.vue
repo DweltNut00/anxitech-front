@@ -124,9 +124,7 @@
         loading.value = false;
         items.value = dataJson.data;
 
-        if (dataJson.data.length != limit) {
-            salir();
-        }
+      
 
         for (let i = 0; i < dataJson.data.length; i++) {
             const element = dataJson.data[i];

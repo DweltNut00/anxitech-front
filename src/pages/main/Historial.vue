@@ -37,7 +37,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue'; // ← agrega computed
 import { useRouter } from 'vue-router';
 import { useUsuarioStore } from '@/stores/usuario';
 
