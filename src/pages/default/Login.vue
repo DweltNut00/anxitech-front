@@ -293,7 +293,7 @@ const sendCode = async () => {
         return;
     }
 
-    dialog.value = true  // mostrar loading
+    dialog.value = true
 
     try {
         const data = await (await fetch(import.meta.env.VITE_ENDPOINT + 'users.php?action=enviarCodigo', {
@@ -302,7 +302,9 @@ const sendCode = async () => {
             body: JSON.stringify({ email: email.value })
         })).json()
 
-        dialog.value = false  // ocultar loading
+        console.log('Respuesta enviarCodigo:', data) // ← agrega esto
+
+        dialog.value = false
 
         if (data.status != 'ok') {
             text.value = data.message;
@@ -315,7 +317,7 @@ const sendCode = async () => {
         dialog.value = false
         text.value = "Ha ocurrido un error al enviar el correo.";
         snackbar.value = true;
-        console.log(error)
+        console.log('Error detallado:', error) // ← agrega esto
     }
 }
 
