@@ -355,18 +355,17 @@
     </v-form>
 
     <!-- COMPLETADO -->
-    <div v-else>
-      <v-card
-        title="¡Gracias!"
-        subtitle="Se han registrado las respuestas de tu encuesta."
-        variant="tonal"
-        color="blue"
-      >
-        <v-card-text
-          >Esta información es complementaria y confidencial.</v-card-text
-        >
-      </v-card>
-    </div>
+   <div v-else>
+    <v-card title="¡Gracias!" subtitle="Se han registrado las respuestas." variant="tonal" color="blue">
+        <v-card-text>Esta información es complementaria y confidencial.</v-card-text>
+        <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" variant="flat" prepend-icon="mdi-check" @click="verificarYRedirigir">
+                Continuar
+            </v-btn>
+        </v-card-actions>
+    </v-card>
+</div>
 
     <v-divider class="my-2"></v-divider>
 
@@ -638,14 +637,10 @@ const enviarEncuesta = async () => {
             body: JSON.stringify({ id_alumno: usuarioStore.getId() })
         }
     )).json();
-
-    setTimeout(() => {
-        if (dataJson.data.length === 0) {
-            router.push({ name: 'panel-encuesta' }) // Falta DASS-21
-        } else {
-            router.push({ name: 'panel-inicio' }) // Ya contestó las 2
-        }
-    }, 2000);
+setTimeout(() => {
+    dialog.value = false;
+    completado.value = true;
+}, 500);
 }, 500);
   } catch (error) {
     text.value = "Ha ocurrido un error.";
@@ -658,6 +653,23 @@ const enviarEncuesta = async () => {
 const salir = async () => {
   router.push({ name: "panel-inicio" });
 };
+
+const verificarYRedirigir = async () => {
+    const dataJson = await (await fetch(
+        import.meta.env.VITE_ENDPOINT + 'questions.php?action=getMisAplicaciones',
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_alumno: usuarioStore.getId() })
+        }
+    )).json();
+
+    if (dataJson.data.length === 0) {
+        router.push({ name: 'panel-encuesta' })
+    } else {
+        router.push({ name: 'panel-inicio' })
+    }
+}
 
 onMounted(() => {
   getUserInfo();

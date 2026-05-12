@@ -46,7 +46,7 @@
       </v-card>
     </div>
     <div v-else>
-      <Recomendaciones :suma="suma" />
+      <Recomendaciones :suma="suma" @continuar="verificarYRedirigir"/>
       <v-card
         title="¡Gracias!"
         subtitle="Se han registrado las respuestas de tu encuesta."
@@ -243,13 +243,10 @@ const enviarEncuesta = async () => {
         }
     )).json();
 
-    setTimeout(() => {
-        if (dataJson.data.length === 0) {
-            router.push({ name: 'panel-encuesta-extra' }) // Falta complementaria
-        } else {
-            router.push({ name: 'panel-inicio' }) // Ya contestó las 2
-        }
-    }, 2000);
+ setTimeout(() => {
+    dialog.value = false;
+    completado.value = true;
+}, 500);
 }, 500);
   } catch (error) {
     text.value = "Ha ocurrido un error.";
@@ -261,11 +258,6 @@ const enviarEncuesta = async () => {
 const salir = async () => {
   router.push({ name: "panel-inicio" });
 };
-
-onBeforeMount(async () => {
-  if (usuarioStore.getIdAplicacion() === null) {
-    router.push({ name: "panel-inicio" });
-  }
 
 const verificarYRedirigir = async () => {
     const dataJson = await (await fetch(
@@ -283,6 +275,11 @@ const verificarYRedirigir = async () => {
         router.push({ name: 'panel-inicio' })
     }
 }
+
+onBeforeMount(async () => {
+  if (usuarioStore.getIdAplicacion() === null) {
+    router.push({ name: "panel-inicio" });
+  }
 
 
   await getEncuesta();
