@@ -229,13 +229,28 @@ const enviarEncuesta = async () => {
       return;
     }
 
+    setTimeout(async () => {
+    dialog.value = false
+    completado.value = true;
+
+    // Verificar si ya contestó complementaria
+    const dataJson = await (await fetch(
+        import.meta.env.VITE_ENDPOINT + 'questions.php?action=getMisAplicacionesExtra',
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_alumno: usuarioStore.getId() })
+        }
+    )).json();
+
     setTimeout(() => {
-      dialog.value = false;
-      completado.value = true;
-      setTimeout(() => {
-        router.push({ name: "panel-encuesta-extra" });
-      }, 2000);
-    }, 500);
+        if (dataJson.data.length === 0) {
+            router.push({ name: 'panel-encuesta-extra' }) // Falta complementaria
+        } else {
+            router.push({ name: 'panel-inicio' }) // Ya contestó las 2
+        }
+    }, 2000);
+}, 500);
   } catch (error) {
     text.value = "Ha ocurrido un error.";
     snackbar.value = true;
@@ -251,6 +266,24 @@ onBeforeMount(async () => {
   if (usuarioStore.getIdAplicacion() === null) {
     router.push({ name: "panel-inicio" });
   }
+
+const verificarYRedirigir = async () => {
+    const dataJson = await (await fetch(
+        import.meta.env.VITE_ENDPOINT + 'questions.php?action=getMisAplicacionesExtra',
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_alumno: usuarioStore.getId() })
+        }
+    )).json();
+
+    if (dataJson.data.length === 0) {
+        router.push({ name: 'panel-encuesta-extra' })
+    } else {
+        router.push({ name: 'panel-inicio' })
+    }
+}
+
 
   await getEncuesta();
 });
