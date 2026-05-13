@@ -636,7 +636,19 @@ const verificarYRedirigir = async () => {
     ).json();
 
     if (dataJson.data.length === 0) {
-        router.push({ name: "panel-encuesta" });
+        // Falta DASS-21 — obtener el id de la aplicación disponible
+        const disponibles = await (
+            await fetch(import.meta.env.VITE_ENDPOINT + "questions.php?action=getAplicaciones")
+        ).json();
+
+        if (disponibles.data.length > 0) {
+            // Setear el id correcto de DASS-21 antes de redirigir
+            usuarioStore.setIdAplicacion(disponibles.data[0].id);
+            router.push({ name: "panel-encuesta" });
+        } else {
+            // No hay aplicación DASS-21 disponible, ir al inicio
+            router.push({ name: "panel-inicio" });
+        }
     } else {
         router.push({ name: "panel-inicio" });
     }
