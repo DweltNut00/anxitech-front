@@ -77,17 +77,6 @@
       </v-btn>
     </div>
 
-    <div class="bottom" v-if="completado">
-      <v-btn
-        block
-        prepend-icon="mdi-check"
-        variant="flat"
-        color="blue"
-        @click="salir"
-      >
-        Regresar a Inicio
-      </v-btn>
-    </div>
 
     <v-dialog v-model="dialog" max-width="320" persistent>
       <v-list class="py-2" color="primary" elevation="12" rounded="lg">
@@ -154,135 +143,98 @@ const loadingBtn = ref(false);
 const suma = ref(0);
 
 const getEncuesta = async () => {
-  const dataJson = await (
-    await fetch(
-      import.meta.env.VITE_ENDPOINT + "questions.php?action=getEncuesta",
-    )
-  ).json();
+    const dataJson = await (
+        await fetch(import.meta.env.VITE_ENDPOINT + "questions.php?action=getEncuesta")
+    ).json();
 
-  console.log("Respuesta API:", dataJson); // ← agrega esto
+    loading.value = false;
+    items.value = dataJson.data;
 
-  loading.value = false;
-  items.value = dataJson.data;
-
-  if (dataJson.data.length != limit) {
-    console.log(
-      "Redirigiendo — preguntas recibidas:",
-      dataJson.data.length,
-      "esperadas:",
-      limit,
-    ); // ← y esto
-    salir();
-  }
+    if (dataJson.data.length != limit) {
+        salir();
+    }
 };
 
 const enviarEncuesta = async () => {
-  loadingBtn.value = true;
+    loadingBtn.value = true;
 
-  let contestadas = 0;
-  let body = [];
-  for (let i = 0; i < respuestas.value.length; i++) {
-    const element = respuestas.value[i];
-    //console.log(element);
-
-    if (element !== undefined) {
-      contestadas++;
-      suma.value += element;
-      body.push({
-        id_pregunta: items.value[i].id,
-        value: element,
-      });
-    }
-  }
-
-  if (contestadas != limit) {
-    text.value = "No has respondido a todas las preguntas.";
-    snackbar.value = true;
-    loadingBtn.value = false;
-    return;
-  }
-
-  try {
-    dialog.value = true;
-
-    const register = await (
-      await fetch(
-        import.meta.env.VITE_ENDPOINT + "questions.php?action=registerEncuesta",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            id_alumno: usuarioStore.getId(),
-            id_aplicacion: usuarioStore.getIdAplicacion(),
-            preguntas: body,
-          }),
-        },
-      )
-    ).json();
-
-    if (register.status != "ok") {
-      text.value = register.message;
-      snackbar.value = true;
-      loadingBtn.value = false;
-      return;
-    }
-
-    setTimeout(async () => {
-    dialog.value = false
-    completado.value = true;
-
-    // Verificar si ya contestó complementaria
-    const dataJson = await (await fetch(
-        import.meta.env.VITE_ENDPOINT + 'questions.php?action=getMisAplicacionesExtra',
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_alumno: usuarioStore.getId() })
+    let contestadas = 0;
+    let body = [];
+    for (let i = 0; i < respuestas.value.length; i++) {
+        const element = respuestas.value[i];
+        if (element !== undefined) {
+            contestadas++;
+            suma.value += element;
+            body.push({ id_pregunta: items.value[i].id, value: element });
         }
-    )).json();
+    }
 
- setTimeout(() => {
-    dialog.value = false;
-    completado.value = true;
-}, 500);
-}, 500);
-  } catch (error) {
-    text.value = "Ha ocurrido un error.";
-    snackbar.value = true;
-    dialog.value = false;
-  }
+    if (contestadas != limit) {
+        text.value = "No has respondido a todas las preguntas.";
+        snackbar.value = true;
+        loadingBtn.value = false;
+        return;
+    }
+
+    try {
+        dialog.value = true;
+
+        const register = await (
+            await fetch(import.meta.env.VITE_ENDPOINT + "questions.php?action=registerEncuesta", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id_alumno: usuarioStore.getId(),
+                    id_aplicacion: usuarioStore.getIdAplicacion(),
+                    preguntas: body,
+                }),
+            })
+        ).json();
+
+        if (register.status != "ok") {
+            text.value = register.message;
+            snackbar.value = true;
+            loadingBtn.value = false;
+            return;
+        }
+
+        setTimeout(() => {
+            dialog.value = false;
+            completado.value = true;
+        }, 500);
+
+    } catch (error) {
+        text.value = "Ha ocurrido un error.";
+        snackbar.value = true;
+        dialog.value = false;
+    }
 };
 
 const salir = async () => {
-  router.push({ name: "panel-inicio" });
+    router.push({ name: "panel-inicio" });
 };
 
 const verificarYRedirigir = async () => {
-    const dataJson = await (await fetch(
-        import.meta.env.VITE_ENDPOINT + 'questions.php?action=getMisAplicacionesExtra',
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_alumno: usuarioStore.getId() })
-        }
-    )).json();
+    const dataJson = await (
+        await fetch(import.meta.env.VITE_ENDPOINT + "questions.php?action=getMisAplicacionesExtra", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id_alumno: usuarioStore.getId() }),
+        })
+    ).json();
 
     if (dataJson.data.length === 0) {
-        router.push({ name: 'panel-encuesta-extra' })
+        router.push({ name: "panel-encuesta-extra" });
     } else {
-        router.push({ name: 'panel-inicio' })
+        router.push({ name: "panel-inicio" });
     }
-}
+};
 
 onBeforeMount(async () => {
-  if (usuarioStore.getIdAplicacion() === null) {
-    router.push({ name: "panel-inicio" });
-  }
-
-
-  await getEncuesta();
+    if (usuarioStore.getIdAplicacion() === null) {
+        router.push({ name: "panel-inicio" });
+    }
+    await getEncuesta();
 });
 </script>
 

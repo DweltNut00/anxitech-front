@@ -457,32 +457,26 @@ const maestrosOpciones = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
 const userInfo = ref({ sexo: "", edad: 0, estado_civil: "" });
 
-// ── Reglas de validación ─────────────────────────────────────────
-
 const basicRules = ref([
-  (value) => (value !== null && value !== undefined) || "Campo requerido.",
+    (value) => (value !== null && value !== undefined) || "Campo requerido.",
 ]);
 
 const promedioRules = ref([
-  (value) =>
-    (value !== null && value !== undefined && value !== "") ||
-    "Promedio requerido.",
-  (value) => {
-    const num = parseFloat(value);
-    if (!isNaN(num) && num >= 0 && num <= 100) return true;
-    return "El promedio debe ser un número entre 0 y 100.";
-  },
+    (value) => (value !== null && value !== undefined && value !== "") || "Promedio requerido.",
+    (value) => {
+        const num = parseFloat(value);
+        if (!isNaN(num) && num >= 0 && num <= 100) return true;
+        return "El promedio debe ser un número entre 0 y 100.";
+    },
 ]);
 
 const soloNumerosDecimal = (event) => {
-  const char = String.fromCharCode(event.keyCode || event.which);
-  const valor = event.target.value;
-  if (/[0-9]/.test(char)) return;
-  if (char === "." && !valor.includes(".")) return;
-  event.preventDefault();
+    const char = String.fromCharCode(event.keyCode || event.which);
+    const valor = event.target.value;
+    if (/[0-9]/.test(char)) return;
+    if (char === "." && !valor.includes(".")) return;
+    event.preventDefault();
 };
-
-// ── Variables reactivas ──────────────────────────────────────────
 
 const carrera = ref();
 const modalidad = ref("presencial");
@@ -498,187 +492,164 @@ const tiene_hijos = ref("0");
 const ingreso_mensual = ref();
 const horas_sueno = ref();
 
-// ── Catálogos ────────────────────────────────────────────────────
-
 const carreras = [
-  { label: "Ingeniería en Sistemas Computacionales", value: "ISC" },
-  { label: "Ingeniería Informática", value: "IINF" },
-  { label: "Ingeniería en Ciencia de Datos", value: "ICD" },
-  { label: "Ingeniería en Gestión Empresarial", value: "IGE" },
-  { label: "Ingeniería Química", value: "IQ" },
-  { label: "Ingeniería Eléctrica", value: "IELE" },
-  { label: "Ingeniería Electrónica", value: "IELC" },
-  { label: "Ingeniería en Semiconductores", value: "ISEM" },
-  { label: "Ingeniería Industrial", value: "IIND" },
-  { label: "Ingeniería Mecánica", value: "IM" },
+    { label: "Ingeniería en Sistemas Computacionales", value: "ISC" },
+    { label: "Ingeniería Informática", value: "IINF" },
+    { label: "Ingeniería en Ciencia de Datos", value: "ICD" },
+    { label: "Ingeniería en Gestión Empresarial", value: "IGE" },
+    { label: "Ingeniería Química", value: "IQ" },
+    { label: "Ingeniería Eléctrica", value: "IELE" },
+    { label: "Ingeniería Electrónica", value: "IELC" },
+    { label: "Ingeniería en Semiconductores", value: "ISEM" },
+    { label: "Ingeniería Industrial", value: "IIND" },
+    { label: "Ingeniería Mecánica", value: "IM" },
 ];
 
 const transportes = [
-  { label: "Transporte público", value: 0 },
-  { label: "Vehículo particular", value: 1 },
-  { label: "Caminando", value: 2 },
+    { label: "Transporte público", value: 0 },
+    { label: "Vehículo particular", value: 1 },
+    { label: "Caminando", value: 2 },
 ];
 
 const familiaresOpciones = [
-  { label: "Vivo solo", value: 0 },
-  { label: "Con familiares", value: 1 },
-  { label: "Con amigos", value: 2 },
-  { label: "Con conocidos", value: 3 },
+    { label: "Vivo solo", value: 0 },
+    { label: "Con familiares", value: 1 },
+    { label: "Con amigos", value: 2 },
+    { label: "Con conocidos", value: 3 },
 ];
 
 const ingresosOpciones = [
-  { label: "Sin ingreso", value: 0 },
-  { label: "Menos de $3,000 al mes", value: 1 },
-  { label: "Entre $3,000 y $6,000 al mes", value: 2 },
-  { label: "Entre $6,000 y $10,000 al mes", value: 3 },
-  { label: "Más de $10,000 al mes", value: 4 },
+    { label: "Sin ingreso", value: 0 },
+    { label: "Menos de $3,000 al mes", value: 1 },
+    { label: "Entre $3,000 y $6,000 al mes", value: 2 },
+    { label: "Entre $6,000 y $10,000 al mes", value: 3 },
+    { label: "Más de $10,000 al mes", value: 4 },
 ];
 
 const horasSuenoOpciones = [
-  { label: "Menos de 4 horas", value: 0 },
-  { label: "De 4 a 6 horas", value: 1 },
-  { label: "De 6 a 8 horas", value: 2 },
-  { label: "Más de 8 horas", value: 3 },
+    { label: "Menos de 4 horas", value: 0 },
+    { label: "De 4 a 6 horas", value: 1 },
+    { label: "De 6 a 8 horas", value: 2 },
+    { label: "Más de 8 horas", value: 3 },
 ];
 
-// ── Funciones ────────────────────────────────────────────────────
-
 const calcularEdad = (fechaNacimiento) => {
-  const hoy = new Date();
-  const nacimiento = new Date(fechaNacimiento);
-  let edad = hoy.getFullYear() - nacimiento.getFullYear();
-  const mes = hoy.getMonth() - nacimiento.getMonth();
-  if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
-  return edad;
+    const hoy = new Date();
+    const nacimiento = new Date(fechaNacimiento);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
+    return edad;
 };
 
 const getUserInfo = async () => {
-  try {
-    const response = await fetch(
-      import.meta.env.VITE_ENDPOINT + "users.php?action=getAlumnoById",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: usuarioStore.getId() }),
-      },
-    );
-    const data = await response.json();
-    if (data.status === "ok" && data.data) {
-      userInfo.value = {
-        sexo: data.data.sexo,
-        edad: calcularEdad(data.data.fechan),
-        estado_civil: data.data.estadoc,
-      };
+    try {
+        const response = await fetch(
+            import.meta.env.VITE_ENDPOINT + "users.php?action=getAlumnoById",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: usuarioStore.getId() }),
+            }
+        );
+        const data = await response.json();
+        if (data.status === "ok" && data.data) {
+            userInfo.value = {
+                sexo: data.data.sexo,
+                edad: calcularEdad(data.data.fechan),
+                estado_civil: data.data.estadoc,
+            };
+        }
+    } catch (error) {
+        console.error("Error al obtener info del usuario:", error);
     }
-  } catch (error) {
-    console.error("Error al obtener info del usuario:", error);
-  }
 };
 
 const enviarEncuesta = async () => {
-  if (!form_valid.value) {
-    text.value = "Verifica tus respuestas.";
-    snackbar.value = true;
-    return;
-  }
-
-  try {
-    dialog.value = true;
-
-    const rawResponse = await fetch(
-      import.meta.env.VITE_ENDPOINT +
-        "questions.php?action=registerEncuestaExtra",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id_alumno: usuarioStore.getId(),
-          id_aplicacion: usuarioStore.getIdAplicacion(),
-          carrera: carrera.value,
-          modalidad: modalidad.value,
-          promedio_anterior: promedio.value,
-          semestre: semestre.value,
-          materias: materias.value,
-          transporte: transporte.value,
-          familiares: familiares.value,
-          trabajo: trabajo.value,
-          beca: beca.value,
-          maestros_estrictos: maestros_estrictos.value,
-          tiene_hijos: tiene_hijos.value,
-          ingreso_mensual: ingreso_mensual.value,
-          horas_sueno: horas_sueno.value,
-        }),
-      },
-    );
-
-    const rawText = await rawResponse.text();
-    console.log("Respuesta cruda:", rawText);
-
-    const register = JSON.parse(rawText);
-
-    if (register.status != "ok") {
-      text.value = register.message;
-      snackbar.value = true;
-      loadingBtn.value = false;
-      dialog.value = false;
-      return;
+    if (!form_valid.value) {
+        text.value = "Verifica tus respuestas.";
+        snackbar.value = true;
+        return;
     }
 
-    setTimeout(async () => {
-    dialog.value = false;
-    completado.value = true;
+    try {
+        dialog.value = true;
 
-    // Verificar si ya contestó DASS-21
-    const dataJson = await (await fetch(
-        import.meta.env.VITE_ENDPOINT + 'questions.php?action=getMisAplicaciones',
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_alumno: usuarioStore.getId() })
+        const rawResponse = await fetch(
+            import.meta.env.VITE_ENDPOINT + "questions.php?action=registerEncuestaExtra",
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id_alumno: usuarioStore.getId(),
+                    id_aplicacion: usuarioStore.getIdAplicacion(),
+                    carrera: carrera.value,
+                    modalidad: modalidad.value,
+                    promedio_anterior: promedio.value,
+                    semestre: semestre.value,
+                    materias: materias.value,
+                    transporte: transporte.value,
+                    familiares: familiares.value,
+                    trabajo: trabajo.value,
+                    beca: beca.value,
+                    maestros_estrictos: maestros_estrictos.value,
+                    tiene_hijos: tiene_hijos.value,
+                    ingreso_mensual: ingreso_mensual.value,
+                    horas_sueno: horas_sueno.value,
+                }),
+            }
+        );
+
+        const register = JSON.parse(await rawResponse.text());
+
+        if (register.status != "ok") {
+            text.value = register.message;
+            snackbar.value = true;
+            loadingBtn.value = false;
+            dialog.value = false;
+            return;
         }
-    )).json();
-setTimeout(() => {
-    dialog.value = false;
-    completado.value = true;
-}, 500);
-}, 500);
-  } catch (error) {
-    text.value = "Ha ocurrido un error.";
-    snackbar.value = true;
-    dialog.value = false;
-    console.log("Error detallado:", error);
-  }
+
+        setTimeout(() => {
+            dialog.value = false;
+            completado.value = true;
+        }, 500);
+
+    } catch (error) {
+        text.value = "Ha ocurrido un error.";
+        snackbar.value = true;
+        dialog.value = false;
+    }
 };
 
 const salir = async () => {
-  router.push({ name: "panel-inicio" });
+    router.push({ name: "panel-inicio" });
 };
 
 const verificarYRedirigir = async () => {
-    const dataJson = await (await fetch(
-        import.meta.env.VITE_ENDPOINT + 'questions.php?action=getMisAplicaciones',
-        {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_alumno: usuarioStore.getId() })
-        }
-    )).json();
+    const dataJson = await (
+        await fetch(import.meta.env.VITE_ENDPOINT + "questions.php?action=getMisAplicaciones", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id_alumno: usuarioStore.getId() }),
+        })
+    ).json();
 
     if (dataJson.data.length === 0) {
-        router.push({ name: 'panel-encuesta' })
+        router.push({ name: "panel-encuesta" });
     } else {
-        router.push({ name: 'panel-inicio' })
+        router.push({ name: "panel-inicio" });
     }
-}
+};
 
 onMounted(() => {
-  getUserInfo();
+    getUserInfo();
 });
 
 onBeforeMount(async () => {
-  if (usuarioStore.getIdAplicacion() === null) {
-    router.push({ name: "panel-inicio" });
-  }
+    if (usuarioStore.getIdAplicacion() === null) {
+        router.push({ name: "panel-inicio" });
+    }
 });
 </script>
 
