@@ -600,6 +600,7 @@ const enviarEncuesta = async () => {
                 body: JSON.stringify({
                     id_alumno: usuarioStore.getId(),
                     id_aplicacion: usuarioStore.getIdAplicacion(),
+                    institucion: institucion.value, // ← agregar
                     carrera: carrera.value,
                     modalidad: modalidad.value,
                     promedio_anterior: promedio.value,
