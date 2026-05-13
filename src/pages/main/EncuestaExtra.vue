@@ -441,7 +441,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, onMounted, ref, shallowRef, computed } from "vue";
+import { onBeforeMount, onMounted, ref, shallowRef, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useUsuarioStore } from "@/stores/usuario";
 
@@ -459,10 +459,7 @@ const form_valid = ref(false);
 
 const semestreOpciones = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 const materiasOpciones = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-const maestrosOpciones = computed(() => {
-  const max = materias.value ?? 10;
-  return Array.from({ length: max + 1 }, (_, i) => i);
-});
+
 
 watch(materias, (newVal) => {
   if (maestros_estrictos.value > newVal) {
@@ -496,6 +493,7 @@ const soloNumerosDecimal = (event) => {
 };
 
 const carrera = ref();
+const institucion = ref();  // ← debe estar ANTES del watch y computed
 const modalidad = ref("presencial");
 const promedio = ref();
 const semestre = ref();
@@ -508,6 +506,26 @@ const maestros_estrictos = ref();
 const tiene_hijos = ref("0");
 const ingreso_mensual = ref();
 const horas_sueno = ref();
+
+const maestrosOpciones = computed(() => {
+    const max = materias.value ?? 10;
+    return Array.from({ length: max + 1 }, (_, i) => i);
+});
+
+watch(materias, (newVal) => {
+    if (maestros_estrictos.value > newVal) {
+        maestros_estrictos.value = undefined;
+    }
+});
+
+watch(institucion, () => {
+    carrera.value = undefined;
+});
+
+const carrerasDisponibles = computed(() => {
+    if (institucion.value === "UNPA") return carrerasUNPA;
+    return carrerasITO;
+});
 
 const carrerasITO = [
   { label: "Ingeniería en Sistemas Computacionales", value: "ISC" },
@@ -528,10 +546,7 @@ const carrerasUNPA = [
   { label: "Empresarial", value: "EMP" },
 ];
 
-const carrerasDisponibles = computed(() => {
-  if (institucion.value === "UNPA") return carrerasUNPA;
-  return carrerasITO;
-});
+
 
 const transportes = [
   { label: "Transporte público", value: 0 },
