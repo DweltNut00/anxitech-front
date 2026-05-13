@@ -26,6 +26,23 @@
         >
       </v-card>
 
+      <!-- INSTITUCIÓN -->
+<v-card title="Institución" subtitle="Selecciona tu institución educativa." variant="plain">
+    <template v-slot:prepend>
+        <v-icon color="primary" icon="mdi-school"></v-icon>
+    </template>
+    <v-card-text>
+        <v-select
+            v-model="institucion"
+            label="Institución"
+            :items="institucionOpciones"
+            item-value="value"
+            item-title="label"
+            :rules="basicRules"
+        ></v-select>
+    </v-card-text>
+</v-card>
+
       <!-- CARRERA -->
       <v-card
         title="Carrera"
@@ -39,10 +56,11 @@
           <v-select
             v-model="carrera"
             label="Carrera"
-            :items="carreras"
+            :items="carrerasDisponibles"
             item-value="value"
             item-title="label"
             :rules="basicRules"
+            :disabled="!institucion"
           ></v-select>
         </v-card-text>
       </v-card>
@@ -409,7 +427,7 @@
 </template>
 
 <script setup>
-import { onBeforeMount, onMounted, ref, shallowRef } from "vue";
+import { onBeforeMount, onMounted, ref, shallowRef, computed } from "vue";
 import { useRouter } from "vue-router";
 import { useUsuarioStore } from "@/stores/usuario";
 
@@ -427,7 +445,16 @@ const form_valid = ref(false);
 
 const semestreOpciones = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 const materiasOpciones = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-const maestrosOpciones = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const maestrosOpciones = computed(() => {
+    const max = materias.value ?? 10;
+    return Array.from({ length: max + 1 }, (_, i) => i);
+});
+
+watch(materias, (newVal) => {
+    if (maestros_estrictos.value > newVal) {
+        maestros_estrictos.value = undefined;
+    }
+});
 
 const userInfo = ref({ sexo: "", edad: 0, estado_civil: "" });
 
@@ -466,7 +493,7 @@ const tiene_hijos = ref("0");
 const ingreso_mensual = ref();
 const horas_sueno = ref();
 
-const carreras = [
+const carrerasITO = [
     { label: "Ingeniería en Sistemas Computacionales", value: "ISC" },
     { label: "Ingeniería Informática", value: "IINF" },
     { label: "Ingeniería en Ciencia de Datos", value: "ICD" },
@@ -478,6 +505,18 @@ const carreras = [
     { label: "Ingeniería Industrial", value: "IIND" },
     { label: "Ingeniería Mecánica", value: "IM" },
 ];
+
+
+const carrerasUNPA = [
+    { label: "Medicina", value: "MED" },
+    { label: "Enfermería", value: "ENF" },
+    { label: "Empresarial", value: "EMP" },
+];
+
+const carrerasDisponibles = computed(() => {
+    if (institucion.value === "UNPA") return carrerasUNPA;
+    return carrerasITO;
+});
 
 const transportes = [
     { label: "Transporte público", value: 0 },
@@ -515,6 +554,10 @@ const calcularEdad = (fechaNacimiento) => {
     if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
     return edad;
 };
+
+watch(institucion, () => {
+    carrera.value = undefined;
+});
 
 const getUserInfo = async () => {
     try {
