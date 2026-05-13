@@ -224,7 +224,19 @@ const verificarYRedirigir = async () => {
     ).json();
 
     if (dataJson.data.length === 0) {
-        router.push({ name: "panel-encuesta-extra" });
+        // Falta complementaria — obtener el id de la aplicación disponible
+        const disponibles = await (
+            await fetch(import.meta.env.VITE_ENDPOINT + "questions.php?action=getAplicacionesExtra")
+        ).json();
+
+        if (disponibles.data.length > 0) {
+            // Setear el id correcto de complementaria antes de redirigir
+            usuarioStore.setIdAplicacion(disponibles.data[0].id);
+            router.push({ name: "panel-encuesta-extra" });
+        } else {
+            // No hay aplicación complementaria disponible, ir al inicio
+            router.push({ name: "panel-inicio" });
+        }
     } else {
         router.push({ name: "panel-inicio" });
     }

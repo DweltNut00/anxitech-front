@@ -9,21 +9,6 @@
       </template>
     </v-card>
 
-    <!-- Alerta con información automática -->
-    <v-alert v-if="userInfo.sexo" type="info" variant="tonal" class="mb-4">
-      <div class="text-subtitle-2 font-weight-bold mb-2">
-        📋 Información automática del sistema
-      </div>
-      <div class="text-body-2">
-        <strong>Sexo:</strong>
-        {{ userInfo.sexo === "M" ? "Masculino" : "Femenino" }}<br />
-        <strong>Edad:</strong> {{ userInfo.edad }} años<br />
-        <strong>Estado Civil:</strong> {{ userInfo.estado_civil }}
-      </div>
-      <div class="text-caption mt-2 text-grey-darken-1">
-        <em>Estos datos se guardarán automáticamente con tu encuesta</em>
-      </div>
-    </v-alert>
 
     <v-form v-model="form_valid" v-if="!completado" class="preguntas">
       <!-- ══════════════════════════════════════════════ -->
@@ -385,17 +370,6 @@
       </v-btn>
     </div>
 
-    <div class="bottom" v-if="completado">
-      <v-btn
-        block
-        prepend-icon="mdi-check"
-        variant="flat"
-        color="blue"
-        @click="salir"
-      >
-        Regresar a Inicio
-      </v-btn>
-    </div>
 
     <v-dialog v-model="dialog" max-width="320" persistent>
       <v-list class="py-2" color="primary" elevation="12" rounded="lg">
