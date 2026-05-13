@@ -354,8 +354,8 @@
       </v-card>
     </v-form>
 
-    <!-- COMPLETADO -->
-   <div v-else>
+<!-- COMPLETADO -->
+<div v-else>
     <v-card title="¡Gracias!" subtitle="Se han registrado las respuestas." variant="tonal" color="blue">
         <v-card-text>Esta información es complementaria y confidencial.</v-card-text>
         <v-card-actions>
