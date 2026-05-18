@@ -1328,7 +1328,9 @@ const ticksX = computed(() => {
 });
 
 const ticksY = computed(() => {
-  return [0, 5, 10, 15, 20, 25];
+    const max = maxSeveridad.value || 25;
+    const step = Math.ceil(max / 5 / 5) * 5;
+    return [0, step, step*2, step*3, step*4, max];
 });
 
 const factoresCriticos = computed(() => {
@@ -1393,8 +1395,9 @@ const getXPosition = (estudiantes) => {
 };
 
 const getYPosition = (porcentaje) => {
-  const chartHeight = graficaHeight - paddingTop - paddingBottom;
-  return graficaHeight - paddingBottom - (porcentaje / 25) * chartHeight;
+    const chartHeight = graficaHeight - paddingTop - paddingBottom;
+    const max = maxSeveridad.value || 25;
+    return graficaHeight - paddingBottom - (porcentaje / max) * chartHeight;
 };
 
 const getRadius = (impacto) => {
@@ -1442,17 +1445,20 @@ const getCuadranteColor = (factor) => {
 };
 
 const getNombreCorto = (nombre) => {
-  const mapeo = {
-    "Promedio académico bajo (<70)": "Promedio bajo",
-    "Carga excesiva de materias (7+)": "Materias 7+",
-    "Trabaja y estudia": "Trabajo",
-    "Transporte público": "Transporte",
-    "Presión por mantener beca": "Beca",
-    "Semestres iniciales (1-3)": "Semestres 1-3",
-    "Edad joven (<21 años)": "Edad <21",
-  };
-
-  return mapeo[nombre] || nombre;
+    const mapeo = {
+        "Promedio académico bajo (<70)": "Promedio bajo",
+        "Carga excesiva de materias (7+)": "Materias 7+",
+        "Trabaja y estudia": "Trabajo",
+        "Transporte público": "Transporte",
+        "Presión por mantener beca": "Beca",
+        "Semestres iniciales (1-3)": "Semestres 1-3",
+        "Edad joven (<21 años)": "Edad <21",
+        "Tiene hijos": "Hijos",
+        "Pocas horas de sueño (<6h)": "Sueño <6h",
+        "Ingreso mensual bajo (<3000)": "Ingreso bajo",
+        "Maestros estrictos": "Maestros estrictos",
+    };
+    return mapeo[nombre] || nombre;
 };
 
 // Cargar datos al montar el componente
