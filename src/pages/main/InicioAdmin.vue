@@ -444,523 +444,759 @@
           </v-card>
         </v-col>
       </v-row>
-    <v-row class="mt-4">
-      <v-col cols="12">
-        <v-card elevation="3">
-          <v-card-title class="d-flex align-center">
-            <v-icon color="error" class="mr-2">mdi-grid</v-icon>
-            Matriz de Riesgo: Prevalencia vs Severidad
-          </v-card-title>
+      <v-row class="mt-4">
+        <v-col cols="12">
+          <v-card elevation="3">
+            <v-card-title class="d-flex align-center">
+              <v-icon color="error" class="mr-2">mdi-grid</v-icon>
+              Matriz de Riesgo: Prevalencia vs Severidad
+            </v-card-title>
 
-          <v-card-subtitle class="text-caption">
-            Identifica factores críticos que requieren intervención prioritaria
-          </v-card-subtitle>
+            <v-card-subtitle class="text-caption">
+              Identifica factores críticos que requieren intervención
+              prioritaria
+            </v-card-subtitle>
 
-          <v-card-text>
-            <!-- Indicador de carga -->
-            <div v-if="cargando" class="text-center py-10">
-              <v-progress-circular
-                indeterminate
-                color="primary"
-                size="64"
-              ></v-progress-circular>
-              <p class="mt-4 text-grey">Cargando matriz de riesgo...</p>
-            </div>
-
-            <div v-else-if="factores.length > 0">
-              <!-- Alertas de cuadrantes -->
-              <v-row class="mb-4">
-                <v-col cols="12" md="6">
-                  <v-alert
-                    type="error"
-                    variant="tonal"
-                    density="compact"
-                    v-if="factoresCriticos.length > 0"
-                  >
-                    <strong>🚨 Factores Críticos:</strong>
-                    {{ factoresCriticos.map((f) => f.nombre).join(", ") }}
-                    <br />
-                    <small
-                      >Alta prevalencia + Alta severidad = Requieren
-                      intervención inmediata</small
-                    >
-                  </v-alert>
-                  <v-alert
-                    type="success"
-                    variant="tonal"
-                    density="compact"
-                    v-else
-                  >
-                    <strong>✅ Sin factores en zona crítica</strong>
-                    <br />
-                    <small
-                      >Ningún factor combina alta prevalencia con alta
-                      severidad</small
-                    >
-                  </v-alert>
-                </v-col>
-
-                <v-col cols="12" md="6">
-                  <v-alert
-                    type="warning"
-                    variant="tonal"
-                    density="compact"
-                    v-if="factoresPreocupantes.length > 0"
-                  >
-                    <strong>⚠️ Factores Preocupantes:</strong>
-                    {{ factoresPreocupantes.map((f) => f.nombre).join(", ") }}
-                    <br />
-                    <small
-                      >Alta severidad pero baja prevalencia - Monitoreo
-                      cercano</small
-                    >
-                  </v-alert>
-                </v-col>
-              </v-row>
-
-              <!-- Gráfica de Dispersión -->
-              <div class="matriz-container">
-                <svg
-                  :width="graficaWidth"
-                  :height="graficaHeight"
-                  class="matriz-riesgo"
-                >
-                  <!-- Fondo de cuadrantes -->
-                  <defs>
-                    <pattern
-                      id="grid"
-                      width="50"
-                      height="50"
-                      patternUnits="userSpaceOnUse"
-                    >
-                      <path
-                        d="M 50 0 L 0 0 0 50"
-                        fill="none"
-                        stroke="#e0e0e0"
-                        stroke-width="1"
-                      />
-                    </pattern>
-                  </defs>
-
-                  <!-- Zonas de riesgo coloreadas -->
-                  <!-- Zona CRÍTICA (superior derecha) -->
-                  <rect
-                    :x="
-                      paddingLeft +
-                      (graficaWidth - paddingLeft - paddingRight) / 2
-                    "
-                    :y="paddingTop"
-                    :width="(graficaWidth - paddingLeft - paddingRight) / 2"
-                    :height="(graficaHeight - paddingTop - paddingBottom) / 2"
-                    fill="rgba(244, 67, 54, 0.1)"
-                  />
-
-                  <!-- Zona PREOCUPANTE (superior izquierda) -->
-                  <rect
-                    :x="paddingLeft"
-                    :y="paddingTop"
-                    :width="(graficaWidth - paddingLeft - paddingRight) / 2"
-                    :height="(graficaHeight - paddingTop - paddingBottom) / 2"
-                    fill="rgba(255, 152, 0, 0.08)"
-                  />
-
-                  <!-- Zona ATENCIÓN (inferior derecha) -->
-                  <rect
-                    :x="
-                      paddingLeft +
-                      (graficaWidth - paddingLeft - paddingRight) / 2
-                    "
-                    :y="
-                      paddingTop +
-                      (graficaHeight - paddingTop - paddingBottom) / 2
-                    "
-                    :width="(graficaWidth - paddingLeft - paddingRight) / 2"
-                    :height="(graficaHeight - paddingTop - paddingBottom) / 2"
-                    fill="rgba(255, 193, 7, 0.08)"
-                  />
-
-                  <!-- Zona BAJO RIESGO (inferior izquierda) -->
-                  <rect
-                    :x="paddingLeft"
-                    :y="
-                      paddingTop +
-                      (graficaHeight - paddingTop - paddingBottom) / 2
-                    "
-                    :width="(graficaWidth - paddingLeft - paddingRight) / 2"
-                    :height="(graficaHeight - paddingTop - paddingBottom) / 2"
-                    fill="rgba(76, 175, 80, 0.08)"
-                  />
-
-                  <!-- Grid de fondo -->
-                  <rect
-                    :x="paddingLeft"
-                    :y="paddingTop"
-                    :width="graficaWidth - paddingLeft - paddingRight"
-                    :height="graficaHeight - paddingTop - paddingBottom"
-                    fill="url(#grid)"
-                  />
-
-                  <!-- Ejes principales -->
-                  <line
-                    :x1="paddingLeft"
-                    :y1="paddingTop"
-                    :x2="paddingLeft"
-                    :y2="graficaHeight - paddingBottom"
-                    stroke="#333"
-                    stroke-width="2"
-                  />
-                  <line
-                    :x1="paddingLeft"
-                    :y1="graficaHeight - paddingBottom"
-                    :x2="graficaWidth - paddingRight"
-                    :y2="graficaHeight - paddingBottom"
-                    stroke="#333"
-                    stroke-width="2"
-                  />
-
-                  <!-- Líneas divisorias de cuadrantes -->
-                  <line
-                    :x1="
-                      paddingLeft +
-                      (graficaWidth - paddingLeft - paddingRight) / 2
-                    "
-                    :y1="paddingTop"
-                    :x2="
-                      paddingLeft +
-                      (graficaWidth - paddingLeft - paddingRight) / 2
-                    "
-                    :y2="graficaHeight - paddingBottom"
-                    stroke="#999"
-                    stroke-width="2"
-                    stroke-dasharray="8,4"
-                  />
-                  <line
-                    :x1="paddingLeft"
-                    :y1="
-                      paddingTop +
-                      (graficaHeight - paddingTop - paddingBottom) / 2
-                    "
-                    :x2="graficaWidth - paddingRight"
-                    :y2="
-                      paddingTop +
-                      (graficaHeight - paddingTop - paddingBottom) / 2
-                    "
-                    stroke="#999"
-                    stroke-width="2"
-                    stroke-dasharray="8,4"
-                  />
-
-                  <!-- Labels del eje X (Prevalencia - Estudiantes) -->
-                  <text
-                    :x="(paddingLeft + graficaWidth - paddingRight) / 2"
-                    :y="graficaHeight - 10"
-                    text-anchor="middle"
-                    font-size="14"
-                    font-weight="bold"
-                    fill="#333"
-                  >
-                    Prevalencia (Número de Estudiantes Afectados)
-                  </text>
-
-                  <!-- Labels del eje Y (Severidad - %) -->
-                  <text
-                    :x="20"
-                    :y="(paddingTop + graficaHeight - paddingBottom) / 2"
-                    text-anchor="middle"
-                    font-size="14"
-                    font-weight="bold"
-                    fill="#333"
-                    transform="rotate(-90, 20, 250)"
-                  >
-                    Severidad (% con Ansiedad Alta)
-                  </text>
-
-                  <!-- Marcas del eje X -->
-                  <g v-for="tick in ticksX" :key="'x-' + tick">
-                    <text
-                      :x="getXPosition(tick)"
-                      :y="graficaHeight - paddingBottom + 20"
-                      text-anchor="middle"
-                      font-size="11"
-                      fill="#666"
-                    >
-                      {{ tick }}
-                    </text>
-                    <line
-                      :x1="getXPosition(tick)"
-                      :y1="graficaHeight - paddingBottom"
-                      :x2="getXPosition(tick)"
-                      :y2="graficaHeight - paddingBottom + 5"
-                      stroke="#666"
-                      stroke-width="1"
-                    />
-                  </g>
-
-                  <!-- Marcas del eje Y -->
-                  <g v-for="tick in ticksY" :key="'y-' + tick">
-                    <text
-                      :x="paddingLeft - 10"
-                      :y="getYPosition(tick) + 4"
-                      text-anchor="end"
-                      font-size="11"
-                      fill="#666"
-                    >
-                      {{ tick }}%
-                    </text>
-                    <line
-                      :x1="paddingLeft - 5"
-                      :y1="getYPosition(tick)"
-                      :x2="paddingLeft"
-                      :y2="getYPosition(tick)"
-                      stroke="#666"
-                      stroke-width="1"
-                    />
-                  </g>
-
-                  <!-- Puntos de datos (factores) -->
-                  <g v-for="(factor, index) in factores" :key="index">
-                    <!-- Círculo del factor -->
-                    <circle
-                      :cx="getXPosition(factor.total_estudiantes)"
-                      :cy="getYPosition(factor.alto)"
-                      :r="getRadius(factor.impacto)"
-                      :fill="getColor(factor)"
-                      :stroke="getStrokeColor(factor)"
-                      stroke-width="3"
-                      opacity="0.7"
-                      class="punto-factor"
-                      @mouseenter="mostrarTooltip($event, factor)"
-                      @mouseleave="ocultarTooltip"
-                    />
-
-                    <!-- Label del factor -->
-                    <text
-                      :x="
-                        getXPosition(factor.total_estudiantes) +
-                        getRadius(factor.impacto) +
-                        8
-                      "
-                      :y="getYPosition(factor.alto) + 4"
-                      font-size="11"
-                      font-weight="600"
-                      fill="#333"
-                      class="label-factor"
-                    >
-                      {{ getNombreCorto(factor.factor) }}
-                    </text>
-                  </g>
-
-                  <!-- Leyenda de cuadrantes -->
-                  <g transform="translate(120, 30)">
-                    <rect
-                      x="0"
-                      y="0"
-                      width="15"
-                      height="15"
-                      fill="rgba(244, 67, 54, 0.3)"
-                    />
-                    <text x="20" y="12" font-size="11" fill="#666">
-                      Crítico
-                    </text>
-
-                    <rect
-                      x="100"
-                      y="0"
-                      width="15"
-                      height="15"
-                      fill="rgba(255, 152, 0, 0.3)"
-                    />
-                    <text x="120" y="12" font-size="11" fill="#666">
-                      Preocupante
-                    </text>
-
-                    <rect
-                      x="230"
-                      y="0"
-                      width="15"
-                      height="15"
-                      fill="rgba(255, 193, 7, 0.3)"
-                    />
-                    <text x="250" y="12" font-size="11" fill="#666">
-                      Atención
-                    </text>
-
-                    <rect
-                      x="330"
-                      y="0"
-                      width="15"
-                      height="15"
-                      fill="rgba(76, 175, 80, 0.3)"
-                    />
-                    <text x="350" y="12" font-size="11" fill="#666">
-                      Bajo riesgo
-                    </text>
-                  </g>
-                </svg>
+            <v-card-text>
+              <!-- Indicador de carga -->
+              <div v-if="cargando" class="text-center py-10">
+                <v-progress-circular
+                  indeterminate
+                  color="primary"
+                  size="64"
+                ></v-progress-circular>
+                <p class="mt-4 text-grey">Cargando matriz de riesgo...</p>
               </div>
 
-              <!-- Explicación de cuadrantes -->
-              <v-expansion-panels class="mt-4">
-                <v-expansion-panel>
-                  <v-expansion-panel-title>
-                    <v-icon start color="info">mdi-information</v-icon>
-                    <strong>¿Cómo interpretar esta matriz?</strong>
-                  </v-expansion-panel-title>
-                  <v-expansion-panel-text>
-                    <v-row>
-                      <v-col cols="12" md="6">
-                        <v-card variant="outlined" color="error" class="pa-3">
-                          <h4 class="text-error">
-                            🚨 Cuadrante CRÍTICO (Superior Derecha)
-                          </h4>
-                          <p class="text-caption mt-2">
-                            <strong>Alta prevalencia + Alta severidad</strong
-                            ><br />
-                            Muchos estudiantes afectados Y alto % con ansiedad
-                            severa.<br />
-                            <strong>Acción:</strong> Intervención institucional
-                            INMEDIATA.
-                          </p>
-                        </v-card>
-                      </v-col>
+              <div v-else-if="factores.length > 0">
+                <!-- Alertas de cuadrantes -->
+                <v-row class="mb-4">
+                  <v-col cols="12" md="6">
+                    <v-alert
+                      type="error"
+                      variant="tonal"
+                      density="compact"
+                      v-if="factoresCriticos.length > 0"
+                    >
+                      <strong>🚨 Factores Críticos:</strong>
+                      {{ factoresCriticos.map((f) => f.nombre).join(", ") }}
+                      <br />
+                      <small
+                        >Alta prevalencia + Alta severidad = Requieren
+                        intervención inmediata</small
+                      >
+                    </v-alert>
+                    <v-alert
+                      type="success"
+                      variant="tonal"
+                      density="compact"
+                      v-else
+                    >
+                      <strong>✅ Sin factores en zona crítica</strong>
+                      <br />
+                      <small
+                        >Ningún factor combina alta prevalencia con alta
+                        severidad</small
+                      >
+                    </v-alert>
+                  </v-col>
 
-                      <v-col cols="12" md="6">
-                        <v-card variant="outlined" color="warning" class="pa-3">
-                          <h4 class="text-warning">
-                            ⚠️ Cuadrante PREOCUPANTE (Superior Izquierda)
-                          </h4>
-                          <p class="text-caption mt-2">
-                            <strong>Baja prevalencia + Alta severidad</strong
-                            ><br />
-                            Pocos estudiantes afectados PERO muy alta
-                            severidad.<br />
-                            <strong>Acción:</strong> Atención personalizada para
-                            casos identificados.
-                          </p>
-                        </v-card>
-                      </v-col>
+                  <v-col cols="12" md="6">
+                    <v-alert
+                      type="warning"
+                      variant="tonal"
+                      density="compact"
+                      v-if="factoresPreocupantes.length > 0"
+                    >
+                      <strong>⚠️ Factores Preocupantes:</strong>
+                      {{ factoresPreocupantes.map((f) => f.nombre).join(", ") }}
+                      <br />
+                      <small
+                        >Alta severidad pero baja prevalencia - Monitoreo
+                        cercano</small
+                      >
+                    </v-alert>
+                  </v-col>
+                </v-row>
 
-                      <v-col cols="12" md="6">
-                        <v-card
-                          variant="outlined"
-                          color="orange-lighten-1"
-                          class="pa-3"
-                        >
-                          <h4 class="text-orange">
-                            ⚡ Cuadrante ATENCIÓN (Inferior Derecha)
-                          </h4>
-                          <p class="text-caption mt-2">
-                            <strong>Alta prevalencia + Baja severidad</strong
-                            ><br />
-                            Muchos estudiantes afectados pero baja severidad.<br />
-                            <strong>Acción:</strong> Programas preventivos
-                            masivos.
-                          </p>
-                        </v-card>
-                      </v-col>
+                <!-- Gráfica de Dispersión -->
+                <div class="matriz-container">
+                  <svg
+                    :width="graficaWidth"
+                    :height="graficaHeight"
+                    class="matriz-riesgo"
+                  >
+                    <!-- Fondo de cuadrantes -->
+                    <defs>
+                      <pattern
+                        id="grid"
+                        width="50"
+                        height="50"
+                        patternUnits="userSpaceOnUse"
+                      >
+                        <path
+                          d="M 50 0 L 0 0 0 50"
+                          fill="none"
+                          stroke="#e0e0e0"
+                          stroke-width="1"
+                        />
+                      </pattern>
+                    </defs>
 
-                      <v-col cols="12" md="6">
-                        <v-card variant="outlined" color="success" class="pa-3">
-                          <h4 class="text-success">
-                            ✅ Cuadrante BAJO RIESGO (Inferior Izquierda)
-                          </h4>
-                          <p class="text-caption mt-2">
-                            <strong>Baja prevalencia + Baja severidad</strong
-                            ><br />
-                            Pocos estudiantes afectados y baja severidad.<br />
-                            <strong>Acción:</strong> Monitoreo regular.
-                          </p>
-                        </v-card>
-                      </v-col>
-                    </v-row>
+                    <!-- Zonas de riesgo coloreadas -->
+                    <!-- Zona CRÍTICA (superior derecha) -->
+                    <rect
+                      :x="
+                        paddingLeft +
+                        (graficaWidth - paddingLeft - paddingRight) / 2
+                      "
+                      :y="paddingTop"
+                      :width="(graficaWidth - paddingLeft - paddingRight) / 2"
+                      :height="(graficaHeight - paddingTop - paddingBottom) / 2"
+                      fill="rgba(244, 67, 54, 0.1)"
+                    />
 
-                    <v-divider class="my-3"></v-divider>
+                    <!-- Zona PREOCUPANTE (superior izquierda) -->
+                    <rect
+                      :x="paddingLeft"
+                      :y="paddingTop"
+                      :width="(graficaWidth - paddingLeft - paddingRight) / 2"
+                      :height="(graficaHeight - paddingTop - paddingBottom) / 2"
+                      fill="rgba(255, 152, 0, 0.08)"
+                    />
 
-                    <p class="text-caption">
-                      <strong>Nota sobre el tamaño de los círculos:</strong
-                      ><br />
-                      El radio del círculo es proporcional al
-                      <strong>impacto general</strong> del factor, que considera
-                      la distribución completa (Bajo + Medio + Alto).
-                    </p>
-                  </v-expansion-panel-text>
-                </v-expansion-panel>
-              </v-expansion-panels>
+                    <!-- Zona ATENCIÓN (inferior derecha) -->
+                    <rect
+                      :x="
+                        paddingLeft +
+                        (graficaWidth - paddingLeft - paddingRight) / 2
+                      "
+                      :y="
+                        paddingTop +
+                        (graficaHeight - paddingTop - paddingBottom) / 2
+                      "
+                      :width="(graficaWidth - paddingLeft - paddingRight) / 2"
+                      :height="(graficaHeight - paddingTop - paddingBottom) / 2"
+                      fill="rgba(255, 193, 7, 0.08)"
+                    />
 
-              <!-- Tabla de datos -->
-              <v-divider class="my-4"></v-divider>
-              <v-data-table
-                :headers="headersTabla"
-                :items="factores"
-                :items-per-page="7"
-                density="compact"
-                class="elevation-1"
+                    <!-- Zona BAJO RIESGO (inferior izquierda) -->
+                    <rect
+                      :x="paddingLeft"
+                      :y="
+                        paddingTop +
+                        (graficaHeight - paddingTop - paddingBottom) / 2
+                      "
+                      :width="(graficaWidth - paddingLeft - paddingRight) / 2"
+                      :height="(graficaHeight - paddingTop - paddingBottom) / 2"
+                      fill="rgba(76, 175, 80, 0.08)"
+                    />
+
+                    <!-- Grid de fondo -->
+                    <rect
+                      :x="paddingLeft"
+                      :y="paddingTop"
+                      :width="graficaWidth - paddingLeft - paddingRight"
+                      :height="graficaHeight - paddingTop - paddingBottom"
+                      fill="url(#grid)"
+                    />
+
+                    <!-- Ejes principales -->
+                    <line
+                      :x1="paddingLeft"
+                      :y1="paddingTop"
+                      :x2="paddingLeft"
+                      :y2="graficaHeight - paddingBottom"
+                      stroke="#333"
+                      stroke-width="2"
+                    />
+                    <line
+                      :x1="paddingLeft"
+                      :y1="graficaHeight - paddingBottom"
+                      :x2="graficaWidth - paddingRight"
+                      :y2="graficaHeight - paddingBottom"
+                      stroke="#333"
+                      stroke-width="2"
+                    />
+
+                    <!-- Líneas divisorias de cuadrantes -->
+                    <line
+                      :x1="
+                        paddingLeft +
+                        (graficaWidth - paddingLeft - paddingRight) / 2
+                      "
+                      :y1="paddingTop"
+                      :x2="
+                        paddingLeft +
+                        (graficaWidth - paddingLeft - paddingRight) / 2
+                      "
+                      :y2="graficaHeight - paddingBottom"
+                      stroke="#999"
+                      stroke-width="2"
+                      stroke-dasharray="8,4"
+                    />
+                    <line
+                      :x1="paddingLeft"
+                      :y1="
+                        paddingTop +
+                        (graficaHeight - paddingTop - paddingBottom) / 2
+                      "
+                      :x2="graficaWidth - paddingRight"
+                      :y2="
+                        paddingTop +
+                        (graficaHeight - paddingTop - paddingBottom) / 2
+                      "
+                      stroke="#999"
+                      stroke-width="2"
+                      stroke-dasharray="8,4"
+                    />
+
+                    <!-- Labels del eje X (Prevalencia - Estudiantes) -->
+                    <text
+                      :x="(paddingLeft + graficaWidth - paddingRight) / 2"
+                      :y="graficaHeight - 10"
+                      text-anchor="middle"
+                      font-size="14"
+                      font-weight="bold"
+                      fill="#333"
+                    >
+                      Prevalencia (Número de Estudiantes Afectados)
+                    </text>
+
+                    <!-- Labels del eje Y (Severidad - %) -->
+                    <text
+                      :x="20"
+                      :y="(paddingTop + graficaHeight - paddingBottom) / 2"
+                      text-anchor="middle"
+                      font-size="14"
+                      font-weight="bold"
+                      fill="#333"
+                      transform="rotate(-90, 20, 250)"
+                    >
+                      Severidad (% con Ansiedad Alta)
+                    </text>
+
+                    <!-- Marcas del eje X -->
+                    <g v-for="tick in ticksX" :key="'x-' + tick">
+                      <text
+                        :x="getXPosition(tick)"
+                        :y="graficaHeight - paddingBottom + 20"
+                        text-anchor="middle"
+                        font-size="11"
+                        fill="#666"
+                      >
+                        {{ tick }}
+                      </text>
+                      <line
+                        :x1="getXPosition(tick)"
+                        :y1="graficaHeight - paddingBottom"
+                        :x2="getXPosition(tick)"
+                        :y2="graficaHeight - paddingBottom + 5"
+                        stroke="#666"
+                        stroke-width="1"
+                      />
+                    </g>
+
+                    <!-- Marcas del eje Y -->
+                    <g v-for="tick in ticksY" :key="'y-' + tick">
+                      <text
+                        :x="paddingLeft - 10"
+                        :y="getYPosition(tick) + 4"
+                        text-anchor="end"
+                        font-size="11"
+                        fill="#666"
+                      >
+                        {{ tick }}%
+                      </text>
+                      <line
+                        :x1="paddingLeft - 5"
+                        :y1="getYPosition(tick)"
+                        :x2="paddingLeft"
+                        :y2="getYPosition(tick)"
+                        stroke="#666"
+                        stroke-width="1"
+                      />
+                    </g>
+
+                    <!-- Puntos de datos (factores) -->
+                    <g v-for="(factor, index) in factores" :key="index">
+                      <!-- Círculo del factor -->
+                      <circle
+                        :cx="getXPosition(factor.total_estudiantes)"
+                        :cy="getYPosition(factor.alto)"
+                        :r="getRadius(factor.impacto)"
+                        :fill="getColor(factor)"
+                        :stroke="getStrokeColor(factor)"
+                        stroke-width="3"
+                        opacity="0.7"
+                        class="punto-factor"
+                        @mouseenter="mostrarTooltip($event, factor)"
+                        @mouseleave="ocultarTooltip"
+                      />
+
+                      <!-- Label del factor -->
+                      <text
+                        :x="
+                          getXPosition(factor.total_estudiantes) +
+                          getRadius(factor.impacto) +
+                          8
+                        "
+                        :y="getYPosition(factor.alto) + 4"
+                        font-size="11"
+                        font-weight="600"
+                        fill="#333"
+                        class="label-factor"
+                      >
+                        {{ getNombreCorto(factor.factor) }}
+                      </text>
+                    </g>
+
+                    <!-- Leyenda de cuadrantes -->
+                    <g transform="translate(120, 30)">
+                      <rect
+                        x="0"
+                        y="0"
+                        width="15"
+                        height="15"
+                        fill="rgba(244, 67, 54, 0.3)"
+                      />
+                      <text x="20" y="12" font-size="11" fill="#666">
+                        Crítico
+                      </text>
+
+                      <rect
+                        x="100"
+                        y="0"
+                        width="15"
+                        height="15"
+                        fill="rgba(255, 152, 0, 0.3)"
+                      />
+                      <text x="120" y="12" font-size="11" fill="#666">
+                        Preocupante
+                      </text>
+
+                      <rect
+                        x="230"
+                        y="0"
+                        width="15"
+                        height="15"
+                        fill="rgba(255, 193, 7, 0.3)"
+                      />
+                      <text x="250" y="12" font-size="11" fill="#666">
+                        Atención
+                      </text>
+
+                      <rect
+                        x="330"
+                        y="0"
+                        width="15"
+                        height="15"
+                        fill="rgba(76, 175, 80, 0.3)"
+                      />
+                      <text x="350" y="12" font-size="11" fill="#666">
+                        Bajo riesgo
+                      </text>
+                    </g>
+                  </svg>
+                </div>
+
+                <!-- Explicación de cuadrantes -->
+                <v-expansion-panels class="mt-4">
+                  <v-expansion-panel>
+                    <v-expansion-panel-title>
+                      <v-icon start color="info">mdi-information</v-icon>
+                      <strong>¿Cómo interpretar esta matriz?</strong>
+                    </v-expansion-panel-title>
+                    <v-expansion-panel-text>
+                      <v-row>
+                        <v-col cols="12" md="6">
+                          <v-card variant="outlined" color="error" class="pa-3">
+                            <h4 class="text-error">
+                              🚨 Cuadrante CRÍTICO (Superior Derecha)
+                            </h4>
+                            <p class="text-caption mt-2">
+                              <strong>Alta prevalencia + Alta severidad</strong
+                              ><br />
+                              Muchos estudiantes afectados Y alto % con ansiedad
+                              severa.<br />
+                              <strong>Acción:</strong> Intervención
+                              institucional INMEDIATA.
+                            </p>
+                          </v-card>
+                        </v-col>
+
+                        <v-col cols="12" md="6">
+                          <v-card
+                            variant="outlined"
+                            color="warning"
+                            class="pa-3"
+                          >
+                            <h4 class="text-warning">
+                              ⚠️ Cuadrante PREOCUPANTE (Superior Izquierda)
+                            </h4>
+                            <p class="text-caption mt-2">
+                              <strong>Baja prevalencia + Alta severidad</strong
+                              ><br />
+                              Pocos estudiantes afectados PERO muy alta
+                              severidad.<br />
+                              <strong>Acción:</strong> Atención personalizada
+                              para casos identificados.
+                            </p>
+                          </v-card>
+                        </v-col>
+
+                        <v-col cols="12" md="6">
+                          <v-card
+                            variant="outlined"
+                            color="orange-lighten-1"
+                            class="pa-3"
+                          >
+                            <h4 class="text-orange">
+                              ⚡ Cuadrante ATENCIÓN (Inferior Derecha)
+                            </h4>
+                            <p class="text-caption mt-2">
+                              <strong>Alta prevalencia + Baja severidad</strong
+                              ><br />
+                              Muchos estudiantes afectados pero baja
+                              severidad.<br />
+                              <strong>Acción:</strong> Programas preventivos
+                              masivos.
+                            </p>
+                          </v-card>
+                        </v-col>
+
+                        <v-col cols="12" md="6">
+                          <v-card
+                            variant="outlined"
+                            color="success"
+                            class="pa-3"
+                          >
+                            <h4 class="text-success">
+                              ✅ Cuadrante BAJO RIESGO (Inferior Izquierda)
+                            </h4>
+                            <p class="text-caption mt-2">
+                              <strong>Baja prevalencia + Baja severidad</strong
+                              ><br />
+                              Pocos estudiantes afectados y baja severidad.<br />
+                              <strong>Acción:</strong> Monitoreo regular.
+                            </p>
+                          </v-card>
+                        </v-col>
+                      </v-row>
+
+                      <v-divider class="my-3"></v-divider>
+
+                      <p class="text-caption">
+                        <strong>Nota sobre el tamaño de los círculos:</strong
+                        ><br />
+                        El radio del círculo es proporcional al
+                        <strong>impacto general</strong> del factor, que
+                        considera la distribución completa (Bajo + Medio +
+                        Alto).
+                      </p>
+                    </v-expansion-panel-text>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+
+                <!-- Tabla de datos -->
+                <v-divider class="my-4"></v-divider>
+                <v-data-table
+                  :headers="headersTabla"
+                  :items="factores"
+                  :items-per-page="7"
+                  density="compact"
+                  class="elevation-1"
+                >
+                  <template v-slot:item.factor="{ item }">
+                    <strong>{{ item.factor }}</strong>
+                  </template>
+
+                  <template v-slot:item.total_estudiantes="{ item }">
+                    {{ item.total_estudiantes }}
+                    <small class="text-grey"
+                      >({{
+                        ((item.total_estudiantes / 501) * 100).toFixed(1)
+                      }}%)</small
+                    >
+                  </template>
+
+                  <template v-slot:item.alto="{ item }">
+                    <v-chip
+                      size="small"
+                      :color="
+                        item.alto > 20
+                          ? 'red'
+                          : item.alto > 15
+                            ? 'orange'
+                            : item.alto > 10
+                              ? 'yellow-darken-2'
+                              : 'green'
+                      "
+                    >
+                      {{ item.alto }}%
+                    </v-chip>
+                  </template>
+
+                  <template v-slot:item.cuadrante="{ item }">
+                    <v-chip
+                      size="small"
+                      :color="getCuadranteColor(item)"
+                      variant="flat"
+                    >
+                      {{ getCuadrante(item) }}
+                    </v-chip>
+                  </template>
+                </v-data-table>
+              </div>
+
+              <v-alert v-else type="warning" variant="tonal">
+                No hay datos disponibles para la matriz de riesgo
+              </v-alert>
+
+              <!-- Tooltip flotante -->
+              <div
+                v-if="tooltipVisible"
+                class="tooltip-custom"
+                :style="{ top: tooltipY + 'px', left: tooltipX + 'px' }"
               >
-                <template v-slot:item.factor="{ item }">
-                  <strong>{{ item.factor }}</strong>
-                </template>
-
-                <template v-slot:item.total_estudiantes="{ item }">
-                  {{ item.total_estudiantes }}
-                  <small class="text-grey"
-                    >({{
-                      ((item.total_estudiantes / 501) * 100).toFixed(1)
-                    }}%)</small
-                  >
-                </template>
-
-                <template v-slot:item.alto="{ item }">
-                  <v-chip
-                    size="small"
-                    :color="
-                      item.alto > 20
-                        ? 'red'
-                        : item.alto > 15
-                          ? 'orange'
-                          : item.alto > 10
-                            ? 'yellow-darken-2'
-                            : 'green'
+                <strong>{{ tooltipData.factor }}</strong
+                ><br />
+                Prevalencia: {{ tooltipData.total_estudiantes }} estudiantes ({{
+                  ((tooltipData.total_estudiantes / 501) * 100).toFixed(1)
+                }}%)<br />
+                Severidad: {{ tooltipData.alto }}% con ansiedad alta<br />
+                Impacto: {{ tooltipData.impacto }}%<br />
+                <strong>{{ getCuadrante(tooltipData) }}</strong>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <!-- Gauge Chart -->
+      <v-row class="mt-4">
+        <v-col cols="12" md="6">
+          <v-card elevation="3">
+            <v-card-title class="d-flex align-center">
+              <v-icon color="primary" class="mr-2">mdi-speedometer</v-icon>
+              Indicador Global de Riesgo Institucional
+            </v-card-title>
+            <v-card-subtitle class="text-caption">
+              Porcentaje de estudiantes con ansiedad Alta
+            </v-card-subtitle>
+            <v-card-text class="d-flex flex-column align-center">
+              <div v-if="gaugeData" class="gauge-container">
+                <svg width="300" height="180" viewBox="0 0 300 180">
+                  <!-- Fondo del arco -->
+                  <path
+                    d="M 30 150 A 120 120 0 0 1 270 150"
+                    fill="none"
+                    stroke="#e0e0e0"
+                    stroke-width="24"
+                    stroke-linecap="round"
+                  />
+                  <!-- Arco Bajo (verde) -->
+                  <path
+                    d="M 30 150 A 120 120 0 0 1 150 30"
+                    fill="none"
+                    stroke="#4CAF50"
+                    stroke-width="24"
+                    stroke-linecap="round"
+                    opacity="0.3"
+                  />
+                  <!-- Arco Moderado (naranja) -->
+                  <path
+                    d="M 150 30 A 120 120 0 0 1 237 82"
+                    fill="none"
+                    stroke="#FF9800"
+                    stroke-width="24"
+                    stroke-linecap="round"
+                    opacity="0.3"
+                  />
+                  <!-- Arco Alto (rojo) -->
+                  <path
+                    d="M 237 82 A 120 120 0 0 1 270 150"
+                    fill="none"
+                    stroke="#F44336"
+                    stroke-width="24"
+                    stroke-linecap="round"
+                    opacity="0.3"
+                  />
+                  <!-- Aguja -->
+                  <line
+                    :x1="150"
+                    :y1="150"
+                    :x2="
+                      150 +
+                      90 *
+                        Math.cos(
+                          Math.PI + (gaugeData.porcentaje_alto / 100) * Math.PI,
+                        )
                     "
+                    :y2="
+                      150 +
+                      90 *
+                        Math.sin(
+                          Math.PI + (gaugeData.porcentaje_alto / 100) * Math.PI,
+                        )
+                    "
+                    :stroke="gaugeData.color"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                  />
+                  <!-- Centro -->
+                  <circle cx="150" cy="150" r="8" :fill="gaugeData.color" />
+                  <!-- Valor -->
+                  <text
+                    x="150"
+                    y="125"
+                    text-anchor="middle"
+                    font-size="28"
+                    font-weight="bold"
+                    :fill="gaugeData.color"
                   >
-                    {{ item.alto }}%
-                  </v-chip>
-                </template>
-
-                <template v-slot:item.cuadrante="{ item }">
-                  <v-chip
-                    size="small"
-                    :color="getCuadranteColor(item)"
-                    variant="flat"
+                    {{ gaugeData.porcentaje_alto }}%
+                  </text>
+                  <text
+                    x="150"
+                    y="145"
+                    text-anchor="middle"
+                    font-size="13"
+                    fill="#666"
                   >
-                    {{ getCuadrante(item) }}
-                  </v-chip>
-                </template>
-              </v-data-table>
-            </div>
+                    Ansiedad Alta
+                  </text>
+                  <!-- Labels -->
+                  <text x="20" y="170" font-size="11" fill="#4CAF50">Bajo</text>
+                  <text x="128" y="20" font-size="11" fill="#FF9800">
+                    Moderado
+                  </text>
+                  <text x="240" y="170" font-size="11" fill="#F44336">
+                    Alto
+                  </text>
+                </svg>
 
-            <v-alert v-else type="warning" variant="tonal">
-              No hay datos disponibles para la matriz de riesgo
-            </v-alert>
+                <v-chip :color="gaugeData.color" dark size="large" class="mt-2">
+                  Nivel: {{ gaugeData.nivel_riesgo }}
+                </v-chip>
 
-            <!-- Tooltip flotante -->
-            <div
-              v-if="tooltipVisible"
-              class="tooltip-custom"
-              :style="{ top: tooltipY + 'px', left: tooltipX + 'px' }"
-            >
-              <strong>{{ tooltipData.factor }}</strong
-              ><br />
-              Prevalencia: {{ tooltipData.total_estudiantes }} estudiantes ({{
-                ((tooltipData.total_estudiantes / 501) * 100).toFixed(1)
-              }}%)<br />
-              Severidad: {{ tooltipData.alto }}% con ansiedad alta<br />
-              Impacto: {{ tooltipData.impacto }}%<br />
-              <strong>{{ getCuadrante(tooltipData) }}</strong>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+                <v-row class="mt-4 text-center" style="width: 100%">
+                  <v-col cols="4">
+                    <div class="text-h6" style="color: #4caf50">
+                      {{ gaugeData.distribucion.Bajo }}
+                    </div>
+                    <div class="text-caption">Bajo</div>
+                  </v-col>
+                  <v-col cols="4">
+                    <div class="text-h6" style="color: #ff9800">
+                      {{ gaugeData.distribucion.Medio }}
+                    </div>
+                    <div class="text-caption">Medio</div>
+                  </v-col>
+                  <v-col cols="4">
+                    <div class="text-h6" style="color: #f44336">
+                      {{ gaugeData.distribucion.Alto }}
+                    </div>
+                    <div class="text-caption">Alto</div>
+                  </v-col>
+                </v-row>
+              </div>
+              <v-progress-circular
+                v-else
+                indeterminate
+                color="primary"
+              ></v-progress-circular>
+            </v-card-text>
+          </v-card>
+        </v-col>
+
+        <!-- Sankey Diagram -->
+        <v-col cols="12" md="6">
+          <v-card elevation="3">
+            <v-card-title class="d-flex align-center">
+              <v-icon color="purple" class="mr-2">mdi-arrow-decision</v-icon>
+              Flujo: Factores de Riesgo → Niveles de Ansiedad
+            </v-card-title>
+            <v-card-subtitle class="text-caption">
+              Cantidad de estudiantes por factor y nivel resultante
+            </v-card-subtitle>
+            <v-card-text>
+              <div v-if="sankeyData" class="sankey-container">
+                <div
+                  v-for="link in sankeyLinks"
+                  :key="link.label"
+                  class="sankey-row"
+                >
+                  <div class="sankey-factor">{{ link.factor }}</div>
+                  <div class="sankey-bars">
+                    <div
+                      class="sankey-bar-bajo"
+                      :style="{ width: link.pctBajo + '%' }"
+                      v-if="link.bajo > 0"
+                    >
+                      {{ link.bajo }}
+                    </div>
+                    <div
+                      class="sankey-bar-medio"
+                      :style="{ width: link.pctMedio + '%' }"
+                      v-if="link.medio > 0"
+                    >
+                      {{ link.medio }}
+                    </div>
+                    <div
+                      class="sankey-bar-alto"
+                      :style="{ width: link.pctAlto + '%' }"
+                      v-if="link.alto > 0"
+                    >
+                      {{ link.alto }}
+                    </div>
+                  </div>
+                </div>
+                <!-- Leyenda -->
+                <div class="d-flex gap-4 mt-3">
+                  <div class="d-flex align-center gap-1">
+                    <div
+                      style="
+                        width: 14px;
+                        height: 14px;
+                        background: #4caf50;
+                        border-radius: 2px;
+                      "
+                    ></div>
+                    <span class="text-caption">Bajo</span>
+                  </div>
+                  <div class="d-flex align-center gap-1">
+                    <div
+                      style="
+                        width: 14px;
+                        height: 14px;
+                        background: #ff9800;
+                        border-radius: 2px;
+                      "
+                    ></div>
+                    <span class="text-caption">Medio</span>
+                  </div>
+                  <div class="d-flex align-center gap-1">
+                    <div
+                      style="
+                        width: 14px;
+                        height: 14px;
+                        background: #f44336;
+                        border-radius: 2px;
+                      "
+                    ></div>
+                    <span class="text-caption">Alto</span>
+                  </div>
+                </div>
+              </div>
+              <v-progress-circular
+                v-else
+                indeterminate
+                color="purple"
+              ></v-progress-circular>
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
     </div>
     <!-- Vista para Alumno -->
     <AplicacionesAlumno v-if="usuarioStore.getTipo() === 'Alumno'" />
@@ -1228,6 +1464,46 @@ const severidadColor = computed(() => {
   if (sev > 10) return "yellow-darken-2";
   return "green";
 });
+const gaugeData = ref(null);
+const sankeyData = ref(null);
+const sankeyLinks = ref([]);
+
+const cargarGauge = async () => {
+  try {
+    const response = await fetch(`${API_URL}/api/stats/gauge`);
+    gaugeData.value = await response.json();
+  } catch (err) {
+    console.error('Error gauge:', err);
+  }
+};
+
+const cargarSankey = async () => {
+  try {
+    const response = await fetch(`${API_URL}/api/stats/sankey`);
+    const data = await response.json();
+    sankeyData.value = data;
+
+    const factorNodes = data.nodes.slice(0, 7);
+    const result = factorNodes.map((node, idx) => {
+      const linksDeEste = data.links.filter(l => l.source === idx);
+      const bajo  = linksDeEste.find(l => l.target === 7)?.value || 0;
+      const medio = linksDeEste.find(l => l.target === 8)?.value || 0;
+      const alto  = linksDeEste.find(l => l.target === 9)?.value || 0;
+      const total = bajo + medio + alto;
+      return {
+        factor: node.name,
+        bajo, medio, alto,
+        pctBajo:  total > 0 ? (bajo  / total * 100) : 0,
+        pctMedio: total > 0 ? (medio / total * 100) : 0,
+        pctAlto:  total > 0 ? (alto  / total * 100) : 0,
+      };
+    }).filter(l => l.bajo + l.medio + l.alto > 0);
+
+    sankeyLinks.value = result;
+  } catch (err) {
+    console.error('Error sankey:', err);
+  }
+};
 
 // ============================================
 // MÉTODOS
@@ -1328,9 +1604,9 @@ const ticksX = computed(() => {
 });
 
 const ticksY = computed(() => {
-    const max = maxSeveridad.value || 25;
-    const step = Math.ceil(max / 5 / 5) * 5;
-    return [0, step, step*2, step*3, step*4, max];
+  const max = maxSeveridad.value || 25;
+  const step = Math.ceil(max / 5 / 5) * 5;
+  return [0, step, step * 2, step * 3, step * 4, max];
 });
 
 const factoresCriticos = computed(() => {
@@ -1395,9 +1671,9 @@ const getXPosition = (estudiantes) => {
 };
 
 const getYPosition = (porcentaje) => {
-    const chartHeight = graficaHeight - paddingTop - paddingBottom;
-    const max = maxSeveridad.value || 25;
-    return graficaHeight - paddingBottom - (porcentaje / max) * chartHeight;
+  const chartHeight = graficaHeight - paddingTop - paddingBottom;
+  const max = maxSeveridad.value || 25;
+  return graficaHeight - paddingBottom - (porcentaje / max) * chartHeight;
 };
 
 const getRadius = (impacto) => {
@@ -1445,27 +1721,30 @@ const getCuadranteColor = (factor) => {
 };
 
 const getNombreCorto = (nombre) => {
-    const mapeo = {
-        "Promedio académico bajo (<70)": "Promedio bajo",
-        "Carga excesiva de materias (7+)": "Materias 7+",
-        "Trabaja y estudia": "Trabajo",
-        "Transporte público": "Transporte",
-        "Presión por mantener beca": "Beca",
-        "Semestres iniciales (1-3)": "Semestres 1-3",
-        "Edad joven (<21 años)": "Edad <21",
-        "Tiene hijos": "Hijos",
-        "Pocas horas de sueño (<6h)": "Sueño <6h",
-        "Ingreso mensual bajo (<3000)": "Ingreso bajo",
-        "Maestros estrictos": "Maestros estrictos",
-    };
-    return mapeo[nombre] || nombre;
+  const mapeo = {
+    "Promedio académico bajo (<70)": "Promedio bajo",
+    "Carga excesiva de materias (7+)": "Materias 7+",
+    "Trabaja y estudia": "Trabajo",
+    "Transporte público": "Transporte",
+    "Presión por mantener beca": "Beca",
+    "Semestres iniciales (1-3)": "Semestres 1-3",
+    "Edad joven (<21 años)": "Edad <21",
+    "Tiene hijos": "Hijos",
+    "Pocas horas de sueño (<6h)": "Sueño <6h",
+    "Ingreso mensual bajo (<3000)": "Ingreso bajo",
+    "Maestros estrictos": "Maestros estrictos",
+  };
+  return mapeo[nombre] || nombre;
 };
+
 
 // Cargar datos al montar el componente
 onMounted(() => {
   if (usuarioStore.getTipo() === "Admin") {
     cargarDashboard();
     cargarFactores();
+    cargarGauge();   // ← agregar
+    cargarSankey();  // ← agregar
   }
 });
 </script>
@@ -1788,5 +2067,72 @@ onMounted(() => {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   line-height: 1.8;
   max-width: 300px;
+}
+.gauge-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px;
+}
+
+.sankey-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sankey-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sankey-factor {
+  min-width: 110px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+  text-align: right;
+}
+
+.sankey-bars {
+  flex: 1;
+  display: flex;
+  height: 28px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sankey-bar-bajo {
+  background: #4CAF50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 20px;
+}
+
+.sankey-bar-medio {
+  background: #FF9800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 20px;
+}
+
+.sankey-bar-alto {
+  background: #F44336;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 20px;
 }
 </style>
