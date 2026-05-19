@@ -915,7 +915,11 @@
                     {{ item.total_estudiantes }}
                     <small class="text-grey"
                       >({{
-                        ((item.total_estudiantes / 501) * 100).toFixed(1)
+                        (
+                          (item.total_estudiantes /
+                            (estadisticas.total_alumnos || 1)) *
+                          100
+                        ).toFixed(1)
                       }}%)</small
                     >
                   </template>
@@ -962,7 +966,11 @@
                 <strong>{{ tooltipData.factor }}</strong
                 ><br />
                 Prevalencia: {{ tooltipData.total_estudiantes }} estudiantes ({{
-                  ((tooltipData.total_estudiantes / 501) * 100).toFixed(1)
+                  (
+                    (tooltipData.total_estudiantes /
+                      (estadisticas.total_alumnos || 1)) *
+                    100
+                  ).toFixed(1)
                 }}%)<br />
                 Severidad: {{ tooltipData.alto }}% con ansiedad alta<br />
                 Impacto: {{ tooltipData.impacto }}%<br />
@@ -1473,7 +1481,7 @@ const cargarGauge = async () => {
     const response = await fetch(`${API_URL}/api/stats/gauge`);
     gaugeData.value = await response.json();
   } catch (err) {
-    console.error('Error gauge:', err);
+    console.error("Error gauge:", err);
   }
 };
 
@@ -1484,24 +1492,28 @@ const cargarSankey = async () => {
     sankeyData.value = data;
 
     const factorNodes = data.nodes.slice(0, 7);
-    const result = factorNodes.map((node, idx) => {
-      const linksDeEste = data.links.filter(l => l.source === idx);
-      const bajo  = linksDeEste.find(l => l.target === 7)?.value || 0;
-      const medio = linksDeEste.find(l => l.target === 8)?.value || 0;
-      const alto  = linksDeEste.find(l => l.target === 9)?.value || 0;
-      const total = bajo + medio + alto;
-      return {
-        factor: node.name,
-        bajo, medio, alto,
-        pctBajo:  total > 0 ? (bajo  / total * 100) : 0,
-        pctMedio: total > 0 ? (medio / total * 100) : 0,
-        pctAlto:  total > 0 ? (alto  / total * 100) : 0,
-      };
-    }).filter(l => l.bajo + l.medio + l.alto > 0);
+    const result = factorNodes
+      .map((node, idx) => {
+        const linksDeEste = data.links.filter((l) => l.source === idx);
+        const bajo = linksDeEste.find((l) => l.target === 7)?.value || 0;
+        const medio = linksDeEste.find((l) => l.target === 8)?.value || 0;
+        const alto = linksDeEste.find((l) => l.target === 9)?.value || 0;
+        const total = bajo + medio + alto;
+        return {
+          factor: node.name,
+          bajo,
+          medio,
+          alto,
+          pctBajo: total > 0 ? (bajo / total) * 100 : 0,
+          pctMedio: total > 0 ? (medio / total) * 100 : 0,
+          pctAlto: total > 0 ? (alto / total) * 100 : 0,
+        };
+      })
+      .filter((l) => l.bajo + l.medio + l.alto > 0);
 
     sankeyLinks.value = result;
   } catch (err) {
-    console.error('Error sankey:', err);
+    console.error("Error sankey:", err);
   }
 };
 
@@ -1737,14 +1749,13 @@ const getNombreCorto = (nombre) => {
   return mapeo[nombre] || nombre;
 };
 
-
 // Cargar datos al montar el componente
 onMounted(() => {
   if (usuarioStore.getTipo() === "Admin") {
     cargarDashboard();
     cargarFactores();
-    cargarGauge();   // ← agregar
-    cargarSankey();  // ← agregar
+    cargarGauge(); // ← agregar
+    cargarSankey(); // ← agregar
   }
 });
 </script>
@@ -2104,7 +2115,7 @@ onMounted(() => {
 }
 
 .sankey-bar-bajo {
-  background: #4CAF50;
+  background: #4caf50;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2115,7 +2126,7 @@ onMounted(() => {
 }
 
 .sankey-bar-medio {
-  background: #FF9800;
+  background: #ff9800;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2126,7 +2137,7 @@ onMounted(() => {
 }
 
 .sankey-bar-alto {
-  background: #F44336;
+  background: #f44336;
   display: flex;
   align-items: center;
   justify-content: center;
