@@ -1041,7 +1041,7 @@
                         )
                     "
                     :y2="
-                      150 +
+                      150 -
                       90 *
                         Math.sin(
                           Math.PI - (gaugeData.porcentaje_alto / 100) * Math.PI,
