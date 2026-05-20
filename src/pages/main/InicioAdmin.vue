@@ -1037,14 +1037,14 @@
                       150 +
                       90 *
                         Math.cos(
-                          Math.PI + (gaugeData.porcentaje_alto / 100) * Math.PI,
+                          Math.PI - (gaugeData.porcentaje_alto / 100) * Math.PI,
                         )
                     "
                     :y2="
                       150 +
                       90 *
                         Math.sin(
-                          Math.PI + (gaugeData.porcentaje_alto / 100) * Math.PI,
+                          Math.PI - (gaugeData.porcentaje_alto / 100) * Math.PI,
                         )
                     "
                     :stroke="gaugeData.color"
