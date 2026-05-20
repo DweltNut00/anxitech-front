@@ -1030,7 +1030,7 @@
                     opacity="0.3"
                   />
                   <!-- Aguja -->
-                  <line
+                <!--   <line
                     :x1="150"
                     :y1="150"
                     :x2="150 + 90 * Math.cos(Math.PI * (1 - gaugeData.porcentaje_alto / 100))"
@@ -1038,7 +1038,7 @@
                     :stroke="gaugeData.color"
                     stroke-width="4"
                     stroke-linecap="round"
-                  />
+                  /> -->
                   <!-- Centro -->
                   <circle cx="150" cy="150" r="8" :fill="gaugeData.color" />
                   <!-- Valor -->
