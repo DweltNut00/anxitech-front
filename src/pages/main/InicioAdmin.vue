@@ -1033,20 +1033,8 @@
                   <line
                     :x1="150"
                     :y1="150"
-                    :x2="
-                      150 +
-                      90 *
-                        Math.cos(
-                          Math.PI - (gaugeData.porcentaje_alto / 100) * Math.PI,
-                        )
-                    "
-                    :y2="
-                      150 -
-                      90 *
-                        Math.sin(
-                          Math.PI - (gaugeData.porcentaje_alto / 100) * Math.PI,
-                        )
-                    "
+                    :x2="150 + 90 * Math.cos(Math.PI * (1 - gaugeData.porcentaje_alto / 100))"
+                    :y2="150 - 90 * Math.sin(Math.PI * (1 - gaugeData.porcentaje_alto / 100))"
                     :stroke="gaugeData.color"
                     stroke-width="4"
                     stroke-linecap="round"
