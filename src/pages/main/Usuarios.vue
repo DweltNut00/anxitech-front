@@ -2,6 +2,15 @@
   <div class="usuarios">
     <div class="encabezado">
       <v-btn
+        prepend-icon="mdi-download"
+        variant="flat"
+        color="green"
+        :loading="loadingCSV"
+        @click="exportarCSV"
+      >
+        Exportar dataset (CSV)
+      </v-btn>
+      <v-btn
         block
         prepend-icon="mdi-plus"
         variant="flat"
@@ -260,6 +269,9 @@ const loadingAdmins = ref(false);
 const buscarAdmins = ref("");
 const sizeAdmins = ref(0); // 🔥 Total de admins
 
+// Estado exportación CSV
+const loadingCSV = ref(false);
+
 // Otros estados
 const snackbar = ref(false);
 const text = ref("");
@@ -450,6 +462,50 @@ const cerrarAlumno = async () => {
 const cerrarAdmin = async () => {
   dialogAdmin.value = false;
   await getAdmins();
+};
+
+const exportarCSV = async () => {
+  loadingCSV.value = true;
+  try {
+    const url = `${import.meta.env.VITE_ENDPOINT}users.php?action=getAlumnos&page=1&perPage=99999&search=`;
+    const response = await fetch(url);
+    const json = await response.json();
+
+    if (json.status !== "ok" || !json.data?.length) {
+      text.value = "No hay datos para exportar.";
+      snackbar.value = true;
+      return;
+    }
+
+    const camposExcluidos = new Set(["nombre", "apellido", "email"]);
+    const campos = Object.keys(json.data[0]).filter((k) => !camposExcluidos.has(k));
+
+    const escapeCSV = (val) => {
+      if (val === null || val === undefined) return "";
+      const str = String(val);
+      return str.includes(",") || str.includes('"') || str.includes("\n")
+        ? `"${str.replace(/"/g, '""')}"`
+        : str;
+    };
+
+    const filas = [
+      campos.join(","),
+      ...json.data.map((row) => campos.map((c) => escapeCSV(row[c])).join(",")),
+    ];
+
+    const blob = new Blob([filas.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `dataset_alumnos_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  } catch (error) {
+    text.value = "Error al exportar el dataset.";
+    snackbar.value = true;
+    console.error(error);
+  } finally {
+    loadingCSV.value = false;
+  }
 };
 
 onMounted(() => {
