@@ -467,18 +467,15 @@ const cerrarAdmin = async () => {
 const exportarCSV = async () => {
   loadingCSV.value = true;
   try {
-    const url = `${import.meta.env.VITE_ENDPOINT}users.php?action=getAlumnos&page=1&perPage=99999&search=`;
+    const url = `${import.meta.env.VITE_ENDPOINT}questions.php?action=getDataset`;
     const response = await fetch(url);
     const json = await response.json();
 
     if (json.status !== "ok" || !json.data?.length) {
-      text.value = "No hay datos para exportar.";
+      text.value = "No hay datos de encuestas para exportar.";
       snackbar.value = true;
       return;
     }
-
-    const camposExcluidos = new Set(["nombre", "apellido", "email"]);
-    const campos = Object.keys(json.data[0]).filter((k) => !camposExcluidos.has(k));
 
     const escapeCSV = (val) => {
       if (val === null || val === undefined) return "";
@@ -488,15 +485,16 @@ const exportarCSV = async () => {
         : str;
     };
 
+    const campos = Object.keys(json.data[0]);
     const filas = [
       campos.join(","),
       ...json.data.map((row) => campos.map((c) => escapeCSV(row[c])).join(",")),
     ];
 
-    const blob = new Blob([filas.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(["﻿" + filas.join("\n")], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = `dataset_alumnos_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `dataset_dass21_${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(link.href);
   } catch (error) {
