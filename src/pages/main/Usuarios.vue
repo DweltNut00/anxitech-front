@@ -471,7 +471,12 @@ const exportarCSV = async () => {
     const response = await fetch(url);
     const json = await response.json();
 
-    if (json.status !== "ok" || !json.data?.length) {
+    if (json.status !== "ok") {
+      text.value = json.message || "Error al generar el dataset.";
+      snackbar.value = true;
+      return;
+    }
+    if (!json.data?.length) {
       text.value = "No hay datos de encuestas para exportar.";
       snackbar.value = true;
       return;
