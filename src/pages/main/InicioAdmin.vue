@@ -1193,6 +1193,87 @@
           </v-card>
         </v-col>
       </v-row>
+      <!-- Comparativa por Institución -->
+<v-row class="mt-4" v-if="institucionData">
+    <v-col cols="12">
+        <v-card elevation="3">
+            <v-card-title class="d-flex align-center">
+                <v-icon color="blue" class="mr-2">mdi-school</v-icon>
+                Comparativa por Institución
+            </v-card-title>
+            <v-card-subtitle>Distribución de niveles de ansiedad por universidad</v-card-subtitle>
+            <v-card-text>
+                <v-row>
+                    <v-col
+                        cols="12" md="6"
+                        v-for="(data, inst) in institucionData.instituciones"
+                        :key="inst"
+                    >
+                        <v-card variant="tonal" :color="inst === 'ITO' ? 'blue' : 'purple'">
+                            <v-card-title class="text-center">
+                                {{ inst === 'ITO' ? 'Instituto Tecnológico de Orizaba' : 'Universidad del Papaloapan' }}
+                            </v-card-title>
+                            <v-card-text>
+                                <!-- Total -->
+                                <div class="text-center mb-3">
+                                    <span class="text-h5 font-weight-bold">{{ data.total }}</span>
+                                    <span class="text-caption ml-1">estudiantes</span>
+                                </div>
+
+                                <!-- Barras de niveles -->
+                                <div class="mb-4">
+                                    <div class="d-flex justify-space-between mb-1">
+                                        <span class="text-caption">Bajo</span>
+                                        <span class="text-caption">{{ data.niveles.Bajo }} ({{ ((data.niveles.Bajo / data.total) * 100).toFixed(1) }}%)</span>
+                                    </div>
+                                    <v-progress-linear
+                                        :model-value="(data.niveles.Bajo / data.total) * 100"
+                                        color="success" height="20" rounded
+                                    ></v-progress-linear>
+
+                                    <div class="d-flex justify-space-between mb-1 mt-2">
+                                        <span class="text-caption">Medio</span>
+                                        <span class="text-caption">{{ data.niveles.Medio }} ({{ ((data.niveles.Medio / data.total) * 100).toFixed(1) }}%)</span>
+                                    </div>
+                                    <v-progress-linear
+                                        :model-value="(data.niveles.Medio / data.total) * 100"
+                                        color="warning" height="20" rounded
+                                    ></v-progress-linear>
+
+                                    <div class="d-flex justify-space-between mb-1 mt-2">
+                                        <span class="text-caption">Alto</span>
+                                        <span class="text-caption">{{ data.niveles.Alto }} ({{ ((data.niveles.Alto / data.total) * 100).toFixed(1) }}%)</span>
+                                    </div>
+                                    <v-progress-linear
+                                        :model-value="(data.niveles.Alto / data.total) * 100"
+                                        color="error" height="20" rounded
+                                    ></v-progress-linear>
+                                </div>
+
+                                <!-- Promedios -->
+                                <v-divider class="mb-3"></v-divider>
+                                <v-row class="text-center">
+                                    <v-col cols="4">
+                                        <div class="text-h6">{{ data.promedio_avg }}</div>
+                                        <div class="text-caption">Promedio</div>
+                                    </v-col>
+                                    <v-col cols="4">
+                                        <div class="text-h6">{{ data.materias_avg }}</div>
+                                        <div class="text-caption">Materias</div>
+                                    </v-col>
+                                    <v-col cols="4">
+                                        <div class="text-h6">{{ data.sueno_avg }}</div>
+                                        <div class="text-caption">Sueño (cat.)</div>
+                                    </v-col>
+                                </v-row>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+            </v-card-text>
+        </v-card>
+    </v-col>
+</v-row>
     </div>
     <!-- Vista para Alumno -->
     <AplicacionesAlumno v-if="usuarioStore.getTipo() === 'Alumno'" />
@@ -1210,6 +1291,7 @@ const tooltipVisible = ref(false);
 const tooltipData = ref({});
 const tooltipX = ref(0);
 const tooltipY = ref(0);
+const institucionData = ref(null);
 
 // Configuración de la gráfica
 const graficaWidth = 900;
@@ -1737,13 +1819,23 @@ const getNombreCorto = (nombre) => {
   return mapeo[nombre] || nombre;
 };
 
+const cargarPorInstitucion = async () => {
+    try {
+        const response = await fetch(`${API_URL}/api/stats/por-institucion`);
+        institucionData.value = await response.json();
+    } catch (err) {
+        console.error('Error instituciones:', err);
+    }
+};
+
 // Cargar datos al montar el componente
 onMounted(() => {
   if (usuarioStore.getTipo() === "Admin") {
     cargarDashboard();
     cargarFactores();
     cargarGauge(); // ← agregar
-    cargarSankey(); // ← agregar
+    cargarSankey();
+    cargarPorInstitucion(); // ← agregar
   }
 });
 </script>
