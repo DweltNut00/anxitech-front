@@ -333,134 +333,185 @@
   </div>
   <v-dialog v-model="dialogDetalle" max-width="700" scrollable>
     <v-card v-if="alumnoDetalle && !loadingDetalle">
-        <!-- Header -->
-        <v-card-title class="d-flex align-center justify-space-between">
-            <span>
-                <v-icon color="teal" class="mr-2">mdi-account-details</v-icon>
-                {{ alumnoDetalle.info.nombre }} {{ alumnoDetalle.info.apellido }}
+      <!-- Header -->
+      <v-card-title class="d-flex align-center justify-space-between">
+        <span>
+          <v-icon color="teal" class="mr-2">mdi-account-details</v-icon>
+          {{ alumnoDetalle.info.nombre }} {{ alumnoDetalle.info.apellido }}
+        </span>
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          @click="dialogDetalle = false"
+        ></v-btn>
+      </v-card-title>
+
+      <v-card-text>
+        <!-- Info general -->
+        <v-row class="mb-3">
+          <v-col cols="6" md="3">
+            <div class="text-caption text-grey">Institución</div>
+            <div class="font-weight-bold">
+              {{ alumnoDetalle.info.institucion }}
+            </div>
+          </v-col>
+          <v-col cols="6" md="3">
+            <div class="text-caption text-grey">Carrera</div>
+            <div class="font-weight-bold">{{ alumnoDetalle.info.carrera }}</div>
+          </v-col>
+          <v-col cols="6" md="3">
+            <div class="text-caption text-grey">Semestre</div>
+            <div class="font-weight-bold">
+              {{ alumnoDetalle.info.semestre }}
+            </div>
+          </v-col>
+          <v-col cols="6" md="3">
+            <div class="text-caption text-grey">Promedio</div>
+            <div class="font-weight-bold">
+              {{ alumnoDetalle.info.promedio_anterior }}
+            </div>
+          </v-col>
+        </v-row>
+
+        <v-divider class="mb-4"></v-divider>
+
+        <!-- Puntaje total -->
+        <div class="d-flex align-center justify-center mb-4 gap-4">
+          <div class="text-center">
+            <div class="text-h3 font-weight-bold">
+              {{ alumnoDetalle.puntaje_total }}
+            </div>
+            <div class="text-caption text-grey">Puntaje DASS-21</div>
+          </div>
+          <v-chip
+            :color="
+              alumnoDetalle.nivel_ansiedad === 'Alto'
+                ? 'error'
+                : alumnoDetalle.nivel_ansiedad === 'Medio'
+                  ? 'warning'
+                  : 'success'
+            "
+            size="x-large"
+          >
+            Ansiedad {{ alumnoDetalle.nivel_ansiedad }}
+          </v-chip>
+        </div>
+
+        <!-- Respuestas DASS-21 -->
+        <div class="text-subtitle-2 mb-3">
+          <v-icon size="small" class="mr-1">mdi-format-list-checks</v-icon>
+          Respuestas DASS-21
+        </div>
+
+        <div
+          v-for="(resp, index) in alumnoDetalle.respuestas"
+          :key="resp.id"
+          class="mb-3"
+        >
+          <div class="d-flex justify-space-between align-center mb-1">
+            <span class="text-caption" style="max-width: 75%">
+              <strong>P{{ index + 1 }}.</strong> {{ resp.pregunta }}
             </span>
-            <v-btn icon="mdi-close" variant="text" @click="dialogDetalle = false"></v-btn>
-        </v-card-title>
+            <v-chip :color="colorRespuesta(resp.valor)" size="small">
+              {{ etiquetaRespuesta(resp.valor) }}
+            </v-chip>
+          </div>
+          <v-progress-linear
+            :model-value="(resp.valor / 3) * 100"
+            :color="colorRespuesta(resp.valor)"
+            height="8"
+            rounded
+          ></v-progress-linear>
+        </div>
 
-        <v-card-text>
-            <!-- Info general -->
-            <v-row class="mb-3">
-                <v-col cols="6" md="3">
-                    <div class="text-caption text-grey">Institución</div>
-                    <div class="font-weight-bold">{{ alumnoDetalle.info.institucion }}</div>
-                </v-col>
-                <v-col cols="6" md="3">
-                    <div class="text-caption text-grey">Carrera</div>
-                    <div class="font-weight-bold">{{ alumnoDetalle.info.carrera }}</div>
-                </v-col>
-                <v-col cols="6" md="3">
-                    <div class="text-caption text-grey">Semestre</div>
-                    <div class="font-weight-bold">{{ alumnoDetalle.info.semestre }}</div>
-                </v-col>
-                <v-col cols="6" md="3">
-                    <div class="text-caption text-grey">Promedio</div>
-                    <div class="font-weight-bold">{{ alumnoDetalle.info.promedio_anterior }}</div>
-                </v-col>
-            </v-row>
+        <v-divider class="my-4"></v-divider>
 
-            <v-divider class="mb-4"></v-divider>
-
-            <!-- Puntaje total -->
-            <div class="d-flex align-center justify-center mb-4 gap-4">
-                <div class="text-center">
-                    <div class="text-h3 font-weight-bold">{{ alumnoDetalle.puntaje_total }}</div>
-                    <div class="text-caption text-grey">Puntaje DASS-21</div>
-                </div>
-                <v-chip
-                    :color="alumnoDetalle.nivel_ansiedad === 'Alto' ? 'error' : alumnoDetalle.nivel_ansiedad === 'Medio' ? 'warning' : 'success'"
-                    size="x-large"
-                >
-                    Ansiedad {{ alumnoDetalle.nivel_ansiedad }}
-                </v-chip>
-            </div>
-
-            <!-- Respuestas DASS-21 -->
-            <div class="text-subtitle-2 mb-3">
-                <v-icon size="small" class="mr-1">mdi-format-list-checks</v-icon>
-                Respuestas DASS-21
-            </div>
-
-            <div
-                v-for="(resp, index) in alumnoDetalle.respuestas"
-                :key="resp.id"
-                class="mb-3"
+        <!-- Factores contextuales -->
+        <div class="text-subtitle-2 mb-3">
+          <v-icon size="small" class="mr-1">mdi-clipboard-list</v-icon>
+          Factores Contextuales
+        </div>
+        <v-row>
+          <v-col cols="6" md="4">
+            <v-chip
+              :color="alumnoDetalle.info.trabajo == 1 ? 'orange' : 'grey'"
+              size="small"
+              class="mb-1"
             >
-                <div class="d-flex justify-space-between align-center mb-1">
-                    <span class="text-caption" style="max-width: 75%">
-                        <strong>P{{ index + 1 }}.</strong> {{ resp.pregunta }}
-                    </span>
-                    <v-chip :color="colorRespuesta(resp.valor)" size="small">
-                        {{ etiquetaRespuesta(resp.valor) }}
-                    </v-chip>
-                </div>
-                <v-progress-linear
-                    :model-value="(resp.valor / 3) * 100"
-                    :color="colorRespuesta(resp.valor)"
-                    height="8"
-                    rounded
-                ></v-progress-linear>
-            </div>
-
-            <v-divider class="my-4"></v-divider>
-
-            <!-- Factores contextuales -->
-            <div class="text-subtitle-2 mb-3">
-                <v-icon size="small" class="mr-1">mdi-clipboard-list</v-icon>
-                Factores Contextuales
-            </div>
-            <v-row>
-                <v-col cols="6" md="4">
-                    <v-chip :color="alumnoDetalle.info.trabajo == 1 ? 'orange' : 'grey'" size="small" class="mb-1">
-                        <v-icon start>{{ alumnoDetalle.info.trabajo == 1 ? 'mdi-check' : 'mdi-close' }}</v-icon>
-                        Trabaja
-                    </v-chip>
-                </v-col>
-                <v-col cols="6" md="4">
-                    <v-chip :color="alumnoDetalle.info.beca == 1 ? 'blue' : 'grey'" size="small" class="mb-1">
-                        <v-icon start>{{ alumnoDetalle.info.beca == 1 ? 'mdi-check' : 'mdi-close' }}</v-icon>
-                        Beca
-                    </v-chip>
-                </v-col>
-                <v-col cols="6" md="4">
-                    <v-chip :color="alumnoDetalle.info.tiene_hijos == 1 ? 'purple' : 'grey'" size="small" class="mb-1">
-                        <v-icon start>{{ alumnoDetalle.info.tiene_hijos == 1 ? 'mdi-check' : 'mdi-close' }}</v-icon>
-                        Tiene hijos
-                    </v-chip>
-                </v-col>
-                <v-col cols="6" md="4">
-                    <v-chip color="teal" size="small" class="mb-1">
-                        <v-icon start>mdi-sleep</v-icon>
-                        Sueño cat. {{ alumnoDetalle.info.horas_sueno }}
-                    </v-chip>
-                </v-col>
-                <v-col cols="6" md="4">
-                    <v-chip color="indigo" size="small" class="mb-1">
-                        <v-icon start>mdi-school</v-icon>
-                        {{ alumnoDetalle.info.maestros_estrictos }} maestros estrictos
-                    </v-chip>
-                </v-col>
-                <v-col cols="6" md="4">
-                    <v-chip color="brown" size="small" class="mb-1">
-                        <v-icon start>mdi-currency-usd</v-icon>
-                        Ingreso cat. {{ alumnoDetalle.info.ingreso_mensual }}
-                    </v-chip>
-                </v-col>
-            </v-row>
-        </v-card-text>
+              <v-icon start>{{
+                alumnoDetalle.info.trabajo == 1 ? "mdi-check" : "mdi-close"
+              }}</v-icon>
+              Trabaja
+            </v-chip>
+          </v-col>
+          <v-col cols="6" md="4">
+            <v-chip
+              :color="alumnoDetalle.info.beca == 1 ? 'blue' : 'grey'"
+              size="small"
+              class="mb-1"
+            >
+              <v-icon start>{{
+                alumnoDetalle.info.beca == 1 ? "mdi-check" : "mdi-close"
+              }}</v-icon>
+              Beca
+            </v-chip>
+          </v-col>
+          <v-col cols="6" md="4">
+            <v-chip
+              :color="alumnoDetalle.info.tiene_hijos == 1 ? 'purple' : 'grey'"
+              size="small"
+              class="mb-1"
+            >
+              <v-icon start>{{
+                alumnoDetalle.info.tiene_hijos == 1 ? "mdi-check" : "mdi-close"
+              }}</v-icon>
+              Tiene hijos
+            </v-chip>
+          </v-col>
+          <v-col cols="6" md="4">
+            <v-chip color="teal" size="small" class="mb-1">
+              <v-icon start>mdi-sleep</v-icon>
+              {{ etiquetaSueno(alumnoDetalle.info.horas_sueno) }}
+            </v-chip>
+          </v-col>
+          <v-col cols="6" md="4">
+            <v-chip color="indigo" size="small" class="mb-1">
+              <v-icon start>mdi-school</v-icon>
+              {{ alumnoDetalle.info.maestros_estrictos }} maestros estrictos
+            </v-chip>
+          </v-col>
+          <v-col cols="6" md="4">
+            <v-chip color="brown" size="small" class="mb-1">
+              <v-icon start>mdi-currency-usd</v-icon>
+              {{ etiquetaIngreso(alumnoDetalle.info.ingreso_mensual) }}
+            </v-chip>
+          </v-col>
+          <v-col cols="6" md="4">
+            <v-chip color="blue-grey" size="small" class="mb-1">
+              <v-icon start>mdi-bus</v-icon>
+              {{ etiquetaTransporte(alumnoDetalle.info.transporte) }}
+            </v-chip>
+          </v-col>
+          <v-col cols="6" md="4">
+            <v-chip color="deep-purple" size="small" class="mb-1">
+              <v-icon start>mdi-home</v-icon>
+              {{ etiquetaFamiliares(alumnoDetalle.info.familiares) }}
+            </v-chip>
+          </v-col>
+        </v-row>
+      </v-card-text>
     </v-card>
 
     <!-- Loading -->
     <v-card v-else>
-        <v-card-text class="d-flex justify-center align-center" style="height: 200px">
-            <v-progress-circular indeterminate color="teal"></v-progress-circular>
-        </v-card-text>
+      <v-card-text
+        class="d-flex justify-center align-center"
+        style="height: 200px"
+      >
+        <v-progress-circular indeterminate color="teal"></v-progress-circular>
+      </v-card-text>
     </v-card>
-</v-dialog>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -543,6 +594,35 @@ const etiquetaRespuesta = (valor) => {
 
 const colorRespuesta = (valor) => {
   return ["success", "info", "warning", "error"][valor] || "grey";
+};
+
+const etiquetaSueno = (valor) => {
+  return ["Menos de 4h", "De 4 a 6h", "De 6 a 8h", "Más de 8h"][valor] ?? valor;
+};
+
+const etiquetaIngreso = (valor) => {
+  return (
+    [
+      "Sin ingreso",
+      "Menos de $3,000",
+      "$3,000–$6,000",
+      "$6,000–$10,000",
+      "Más de $10,000",
+    ][valor] ?? valor
+  );
+};
+
+const etiquetaTransporte = (valor) => {
+  return (
+    ["Transporte público", "Vehículo particular", "Caminando"][valor] ?? valor
+  );
+};
+
+const etiquetaFamiliares = (valor) => {
+  return (
+    ["Vivo solo", "Con familiares", "Con amigos", "Con conocidos"][valor] ??
+    valor
+  );
 };
 
 // 🔥 Estados de diálogos
