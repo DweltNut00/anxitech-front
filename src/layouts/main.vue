@@ -93,11 +93,11 @@ const adminRoutes = [
         title: 'Aplicaciones',
         routeName: 'panel-aplicaciones-admin'
     },
-    {
+    /* {
         icon: 'help-circle-outline',
         title: 'Preguntas',
         routeName: 'panel-preguntas-admin'
-    },
+    }, */
 ]
 
 const alumnoRoutes = [

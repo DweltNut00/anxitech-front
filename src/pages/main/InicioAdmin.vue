@@ -980,219 +980,6 @@
           </v-card>
         </v-col>
       </v-row>
-      <!-- Gauge Chart -->
-      <v-row class="mt-4">
-        <v-col cols="12" md="6">
-          <v-card elevation="3">
-            <v-card-title class="d-flex align-center">
-              <v-icon color="primary" class="mr-2">mdi-speedometer</v-icon>
-              Indicador Global de Riesgo Institucional
-            </v-card-title>
-            <v-card-subtitle class="text-caption">
-              Porcentaje de estudiantes con ansiedad Alta
-            </v-card-subtitle>
-            <v-card-text class="d-flex flex-column align-center">
-              <div v-if="gaugeData" class="gauge-container">
-                <svg width="300" height="180" viewBox="0 0 300 180">
-                  <!-- Fondo del arco -->
-                  <path
-                    d="M 30 150 A 120 120 0 0 1 270 150"
-                    fill="none"
-                    stroke="#e0e0e0"
-                    stroke-width="24"
-                    stroke-linecap="round"
-                  />
-                  <!-- Arco Bajo (verde) -->
-                  <path
-                    d="M 30 150 A 120 120 0 0 1 150 30"
-                    fill="none"
-                    stroke="#4CAF50"
-                    stroke-width="24"
-                    stroke-linecap="round"
-                    opacity="0.3"
-                  />
-                  <!-- Arco Moderado (naranja) -->
-                  <path
-                    d="M 150 30 A 120 120 0 0 1 237 82"
-                    fill="none"
-                    stroke="#FF9800"
-                    stroke-width="24"
-                    stroke-linecap="round"
-                    opacity="0.3"
-                  />
-                  <!-- Arco Alto (rojo) -->
-                  <path
-                    d="M 237 82 A 120 120 0 0 1 270 150"
-                    fill="none"
-                    stroke="#F44336"
-                    stroke-width="24"
-                    stroke-linecap="round"
-                    opacity="0.3"
-                  />
-                  <!-- Aguja -->
-                <!--   <line
-                    :x1="150"
-                    :y1="150"
-                    :x2="150 + 90 * Math.cos(Math.PI * (1 - gaugeData.porcentaje_alto / 100))"
-                    :y2="150 - 90 * Math.sin(Math.PI * (1 - gaugeData.porcentaje_alto / 100))"
-                    :stroke="gaugeData.color"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                  /> -->
-                  <!-- Centro -->
-                  <circle cx="150" cy="150" r="8" :fill="gaugeData.color" />
-                  <!-- Valor -->
-                  <text
-                    x="150"
-                    y="125"
-                    text-anchor="middle"
-                    font-size="28"
-                    font-weight="bold"
-                    :fill="gaugeData.color"
-                  >
-                    {{ gaugeData.porcentaje_alto }}%
-                  </text>
-                  <text
-                    x="150"
-                    y="145"
-                    text-anchor="middle"
-                    font-size="13"
-                    fill="#666"
-                  >
-                    Ansiedad Alta
-                  </text>
-                  <!-- Labels -->
-                  <text x="20" y="170" font-size="11" fill="#4CAF50">Bajo</text>
-                  <text x="128" y="20" font-size="11" fill="#FF9800">
-                    Moderado
-                  </text>
-                  <text x="240" y="170" font-size="11" fill="#F44336">
-                    Alto
-                  </text>
-                </svg>
-
-                <v-chip :color="gaugeData.color" dark size="large" class="mt-2">
-                  Nivel: {{ gaugeData.nivel_riesgo }}
-                </v-chip>
-
-                <v-row class="mt-4 text-center" style="width: 100%">
-                  <v-col cols="4">
-                    <div class="text-h6" style="color: #4caf50">
-                      {{ gaugeData.distribucion.Bajo }}
-                    </div>
-                    <div class="text-caption">Bajo</div>
-                  </v-col>
-                  <v-col cols="4">
-                    <div class="text-h6" style="color: #ff9800">
-                      {{ gaugeData.distribucion.Medio }}
-                    </div>
-                    <div class="text-caption">Medio</div>
-                  </v-col>
-                  <v-col cols="4">
-                    <div class="text-h6" style="color: #f44336">
-                      {{ gaugeData.distribucion.Alto }}
-                    </div>
-                    <div class="text-caption">Alto</div>
-                  </v-col>
-                </v-row>
-              </div>
-              <v-progress-circular
-                v-else
-                indeterminate
-                color="primary"
-              ></v-progress-circular>
-            </v-card-text>
-          </v-card>
-        </v-col>
-
-        <!-- Sankey Diagram -->
-        <v-col cols="12" md="6">
-          <v-card elevation="3">
-            <v-card-title class="d-flex align-center">
-              <v-icon color="purple" class="mr-2">mdi-arrow-decision</v-icon>
-              Flujo: Factores de Riesgo → Niveles de Ansiedad
-            </v-card-title>
-            <v-card-subtitle class="text-caption">
-              Cantidad de estudiantes por factor y nivel resultante
-            </v-card-subtitle>
-            <v-card-text>
-              <div v-if="sankeyData" class="sankey-container">
-                <div
-                  v-for="link in sankeyLinks"
-                  :key="link.label"
-                  class="sankey-row"
-                >
-                  <div class="sankey-factor">{{ link.factor }}</div>
-                  <div class="sankey-bars">
-                    <div
-                      class="sankey-bar-bajo"
-                      :style="{ width: link.pctBajo + '%' }"
-                      v-if="link.bajo > 0"
-                    >
-                      {{ link.bajo }}
-                    </div>
-                    <div
-                      class="sankey-bar-medio"
-                      :style="{ width: link.pctMedio + '%' }"
-                      v-if="link.medio > 0"
-                    >
-                      {{ link.medio }}
-                    </div>
-                    <div
-                      class="sankey-bar-alto"
-                      :style="{ width: link.pctAlto + '%' }"
-                      v-if="link.alto > 0"
-                    >
-                      {{ link.alto }}
-                    </div>
-                  </div>
-                </div>
-                <!-- Leyenda -->
-                <div class="d-flex gap-4 mt-3">
-                  <div class="d-flex align-center gap-1">
-                    <div
-                      style="
-                        width: 14px;
-                        height: 14px;
-                        background: #4caf50;
-                        border-radius: 2px;
-                      "
-                    ></div>
-                    <span class="text-caption">Bajo</span>
-                  </div>
-                  <div class="d-flex align-center gap-1">
-                    <div
-                      style="
-                        width: 14px;
-                        height: 14px;
-                        background: #ff9800;
-                        border-radius: 2px;
-                      "
-                    ></div>
-                    <span class="text-caption">Medio</span>
-                  </div>
-                  <div class="d-flex align-center gap-1">
-                    <div
-                      style="
-                        width: 14px;
-                        height: 14px;
-                        background: #f44336;
-                        border-radius: 2px;
-                      "
-                    ></div>
-                    <span class="text-caption">Alto</span>
-                  </div>
-                </div>
-              </div>
-              <v-progress-circular
-                v-else
-                indeterminate
-                color="purple"
-              ></v-progress-circular>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
       <!-- Comparativa por Institución -->
 <v-row class="mt-4" v-if="institucionData">
     <v-col cols="12">
@@ -1262,8 +1049,8 @@
                                         <div class="text-caption">Materias</div>
                                     </v-col>
                                     <v-col cols="4">
-                                        <div class="text-h6">{{ data.sueno_avg }}</div>
-                                        <div class="text-caption">Sueño (cat.)</div>
+                                       <div class="text-h6">{{ etiquetaSueno(data.sueno_avg) }}</div>
+<div class="text-caption">Sueño predominante</div>
                                     </v-col>
                                 </v-row>
                             </v-card-text>
@@ -1300,7 +1087,9 @@ const paddingLeft = 80;
 const paddingRight = 200;
 const paddingTop = 60;
 const paddingBottom = 80;
-
+const etiquetaSueno = (valor) => {
+    return ['Menos de 4h', 'De 4 a 6h', 'De 6 a 8h', 'Más de 8h'][Math.round(valor)] ?? valor;
+};
 // Estado de carga
 const loading = ref(false);
 const error = ref(null);
