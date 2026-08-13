@@ -215,6 +215,76 @@
       </v-card>
     </div>
 
+    <!-- Tabla de factores por alumno -->
+<v-card class="factores-alumno">
+    <v-data-table
+        :headers="headersFactores"
+        :items="alumnosFiltrados"
+        :loading="loadingFactores"
+        density="compact"
+    >
+        <template v-slot:top>
+            <v-toolbar flat>
+                <v-toolbar-title>
+                    <v-icon icon="mdi-account-details"></v-icon>
+                    Factores por Estudiante
+                </v-toolbar-title>
+                <v-select
+                    v-model="filtroInstitucion"
+                    :items="['ITO', 'UNPA']"
+                    label="Institución"
+                    variant="solo-filled"
+                    flat
+                    hide-details
+                    clearable
+                    density="compact"
+                    class="me-2"
+                    style="max-width: 150px"
+                ></v-select>
+                <v-select
+                    v-model="filtroNivel"
+                    :items="['Bajo', 'Medio', 'Alto']"
+                    label="Nivel"
+                    variant="solo-filled"
+                    flat
+                    hide-details
+                    clearable
+                    density="compact"
+                    class="me-2"
+                    style="max-width: 130px"
+                ></v-select>
+            </v-toolbar>
+        </template>
+
+        <template v-slot:item.nivel_ansiedad="{ item }">
+            <v-chip
+                :color="item.nivel_ansiedad === 'Alto' ? 'error' : item.nivel_ansiedad === 'Medio' ? 'warning' : 'success'"
+                size="small"
+            >
+                {{ item.nivel_ansiedad }}
+            </v-chip>
+        </template>
+
+        <template v-slot:item.trabajo="{ item }">
+            <v-icon :color="item.trabajo == 1 ? 'success' : 'grey'" size="small">
+                {{ item.trabajo == 1 ? 'mdi-check-circle' : 'mdi-close-circle' }}
+            </v-icon>
+        </template>
+
+        <template v-slot:item.beca="{ item }">
+            <v-icon :color="item.beca == 1 ? 'success' : 'grey'" size="small">
+                {{ item.beca == 1 ? 'mdi-check-circle' : 'mdi-close-circle' }}
+            </v-icon>
+        </template>
+
+        <template v-slot:item.tiene_hijos="{ item }">
+            <v-icon :color="item.tiene_hijos == 1 ? 'success' : 'grey'" size="small">
+                {{ item.tiene_hijos == 1 ? 'mdi-check-circle' : 'mdi-close-circle' }}
+            </v-icon>
+        </template>
+    </v-data-table>
+</v-card>
+
     <v-dialog v-model="dialog" persistent width="auto">
       <CrearUsuario @cerrar="cerrar" />
     </v-dialog>
@@ -249,7 +319,51 @@ import CrearUsuario from "@/components/main/CrearUsuario.vue";
 import EditarAlumno from "@/components/main/EditarAlumno.vue";
 import EditarAdmin from "@/components/main/EditarAdmin.vue";
 
+const API_URL = import.meta.env.VITE_MODEL_ENDPOINT || 'https://anxitech-model.onrender.com';
 const usuarioStore = useUsuarioStore();
+const alumnosFactores = ref([]);
+const loadingFactores = ref(true);
+const filtroInstitucion = ref('');
+const filtroNivel = ref('');
+
+
+const headersFactores = ref([
+    { title: 'Nombre', key: 'nombre', sortable: true },
+    { title: 'Apellido', key: 'apellido', sortable: true },
+    { title: 'Institución', key: 'institucion', sortable: true },
+    { title: 'Carrera', key: 'carrera', sortable: true },
+    { title: 'Semestre', key: 'semestre', sortable: true },
+    { title: 'Promedio', key: 'promedio_anterior', sortable: true },
+    { title: 'Materias', key: 'materias', sortable: true },
+    { title: 'Trabaja', key: 'trabajo', sortable: true },
+    { title: 'Beca', key: 'beca', sortable: true },
+    { title: 'Hijos', key: 'tiene_hijos', sortable: true },
+    { title: 'Maestros', key: 'maestros_estrictos', sortable: true },
+    { title: 'DASS-21', key: 'puntaje_dass21', sortable: true },
+    { title: 'Nivel', key: 'nivel_ansiedad', sortable: true },
+]);
+
+
+const alumnosFiltrados = computed(() => {
+    return alumnosFactores.value.filter(a => {
+        const coincideInstitucion = !filtroInstitucion.value || a.institucion === filtroInstitucion.value;
+        const coincideNivel = !filtroNivel.value || a.nivel_ansiedad === filtroNivel.value;
+        return coincideInstitucion && coincideNivel;
+    });
+});
+
+const cargarFactoresAlumno = async () => {
+    try {
+        loadingFactores.value = true;
+        const response = await fetch(`${API_URL}/api/stats/por-alumno`);
+        const data = await response.json();
+        alumnosFactores.value = data.alumnos;
+    } catch (err) {
+        console.error('Error factores alumno:', err);
+    } finally {
+        loadingFactores.value = false;
+    }
+};
 
 // 🔥 Estados de diálogos
 const dialog = ref(false);
@@ -514,6 +628,8 @@ const exportarCSV = async () => {
 onMounted(() => {
   getAlumnos({ page: 1, itemsPerPage: itemsPerPage.value });
   getAdmins();
+  cargarFactoresAlumno(); // ← agregar
+
 });
 </script>
 
