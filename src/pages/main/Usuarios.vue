@@ -10,7 +10,7 @@
       >
         Exportar dataset (CSV)
       </v-btn>
-      <v-btn
+      <!-- <v-btn
         block
         prepend-icon="mdi-plus"
         variant="flat"
@@ -18,7 +18,7 @@
         @click="dialog = !dialog"
       >
         Nuevo usuario
-      </v-btn>
+      </v-btn> -->
     </div>
    <!--  <div class="tablas">
       <v-card class="alumnos">
