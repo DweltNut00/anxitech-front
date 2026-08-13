@@ -25,7 +25,7 @@
                         </v-chip>
                     </template>
 
-                    <template v-slot:item.actions="{ item }">
+                    <!-- <template v-slot:item.actions="{ item }">
                         <div class="d-flex ga-1">
                             <v-btn color="medium-emphasis" size="small" icon flat>
                                 <v-icon icon="mdi-delete"></v-icon>
@@ -48,7 +48,7 @@
                                 </v-menu>
                             </v-btn>
                         </div>
-                    </template>
+                    </template> -->
                 </v-data-table-server>
             </v-card>
 

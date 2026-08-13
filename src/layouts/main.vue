@@ -26,8 +26,8 @@
             <template v-slot:append>
                 <div>
                     <v-list density="compact" nav>
-                        <v-list-item prepend-icon="mdi-cog" @click="irA('panel-ajustes')" variant="tonal"
-                            title="Ajustes"></v-list-item>
+                        <!-- <v-list-item prepend-icon="mdi-cog" @click="irA('panel-ajustes')" variant="tonal"
+                            title="Ajustes"></v-list-item> -->
                         <v-list-item prepend-icon="mdi-logout" @click="salir" variant="tonal"
                             title="Cerrar sesión"></v-list-item>
                     </v-list>

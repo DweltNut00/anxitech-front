@@ -19,9 +19,9 @@
                         <div class="field">
                             <v-text-field label="Contraseña" prepend-inner-icon="mdi-key-variant" rounded="lg"
                                 v-model="pass" type="password" :rules="passRules"></v-text-field>
-                            <v-btn variant="text" size="small" class="btn-txt" @click="step++">
+                            <!-- <v-btn variant="text" size="small" class="btn-txt" @click="step++">
                                 Restaurar contrase&ntilde;a.
-                            </v-btn>
+                            </v-btn> -->
                         </div>
                     </div>
 
