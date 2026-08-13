@@ -7,7 +7,7 @@
         </div>
         <div class="tablas">
             <v-card class="aplicaciones">
-                <v-data-table-server :headers="headers" :items="aplicaciones" :items-length="size" :loading="loading"
+                <v-data-table-server :headers="headers" :items="aplicaciones" :items-length="size" :loading="loading" hide-default-footer
                     @update:options="getAplicaciones">
                     <template v-slot:top>
                         <v-toolbar flat>
