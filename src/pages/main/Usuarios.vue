@@ -20,7 +20,7 @@
         Nuevo usuario
       </v-btn>
     </div>
-    <div class="tablas">
+   <!--  <div class="tablas">
       <v-card class="alumnos">
     <v-data-table-server
         :headers="headersAlumnos"
@@ -213,7 +213,7 @@
           </template>
         </v-data-table-server>
       </v-card>
-    </div>
+    </div> -->
 
     <!-- Tabla de factores por alumno -->
 <v-card class="factores-alumno">
