@@ -96,7 +96,7 @@ const headers = ref([
     { title: 'Fecha de cierre', key: 'fin', },
     { title: 'Tipo de encuesta', key: 'tipo', },
     { title: 'Status', key: 'status', },
-    { title: 'Acciones', key: 'actions', sortable: false },
+    // { title: 'Acciones', key: 'actions', sortable: false },
 ])
 
 const getAplicaciones = async () => {
