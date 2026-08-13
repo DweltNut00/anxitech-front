@@ -20,7 +20,7 @@
         Nuevo usuario
       </v-btn> -->
     </div>
-   <!--  <div class="tablas">
+    <!--  <div class="tablas">
       <v-card class="alumnos">
     <v-data-table-server
         :headers="headersAlumnos"
@@ -216,74 +216,95 @@
     </div> -->
 
     <!-- Tabla de factores por alumno -->
-<v-card class="factores-alumno">
-    <v-data-table
+    <v-card class="factores-alumno">
+      <v-data-table
         :headers="headersFactores"
         :items="alumnosFiltrados"
         :loading="loadingFactores"
         density="compact"
-    >
+      >
         <template v-slot:top>
-            <v-toolbar flat>
-                <v-toolbar-title>
-                    <v-icon icon="mdi-account-details"></v-icon>
-                    Factores por Estudiante
-                </v-toolbar-title>
-                <v-select
-                    v-model="filtroInstitucion"
-                    :items="['ITO', 'UNPA']"
-                    label="Institución"
-                    variant="solo-filled"
-                    flat
-                    hide-details
-                    clearable
-                    density="compact"
-                    class="me-2"
-                    style="max-width: 150px"
-                ></v-select>
-                <v-select
-                    v-model="filtroNivel"
-                    :items="['Bajo', 'Medio', 'Alto']"
-                    label="Nivel"
-                    variant="solo-filled"
-                    flat
-                    hide-details
-                    clearable
-                    density="compact"
-                    class="me-2"
-                    style="max-width: 130px"
-                ></v-select>
-            </v-toolbar>
+          <v-toolbar flat>
+            <v-toolbar-title>
+              <v-icon icon="mdi-account-details"></v-icon>
+              Factores por Estudiante
+            </v-toolbar-title>
+            <v-select
+              v-model="filtroInstitucion"
+              :items="['ITO', 'UNPA']"
+              label="Institución"
+              variant="solo-filled"
+              flat
+              hide-details
+              clearable
+              density="compact"
+              class="me-2"
+              style="max-width: 150px"
+            ></v-select>
+            <v-select
+              v-model="filtroNivel"
+              :items="['Bajo', 'Medio', 'Alto']"
+              label="Nivel"
+              variant="solo-filled"
+              flat
+              hide-details
+              clearable
+              density="compact"
+              class="me-2"
+              style="max-width: 130px"
+            ></v-select>
+          </v-toolbar>
         </template>
 
         <template v-slot:item.nivel_ansiedad="{ item }">
-            <v-chip
-                :color="item.nivel_ansiedad === 'Alto' ? 'error' : item.nivel_ansiedad === 'Medio' ? 'warning' : 'success'"
-                size="small"
-            >
-                {{ item.nivel_ansiedad }}
-            </v-chip>
+          <v-chip
+            :color="
+              item.nivel_ansiedad === 'Alto'
+                ? 'error'
+                : item.nivel_ansiedad === 'Medio'
+                  ? 'warning'
+                  : 'success'
+            "
+            size="small"
+          >
+            {{ item.nivel_ansiedad }}
+          </v-chip>
         </template>
 
         <template v-slot:item.trabajo="{ item }">
-            <v-icon :color="item.trabajo == 1 ? 'success' : 'grey'" size="small">
-                {{ item.trabajo == 1 ? 'mdi-check-circle' : 'mdi-close-circle' }}
-            </v-icon>
+          <v-icon :color="item.trabajo == 1 ? 'success' : 'grey'" size="small">
+            {{ item.trabajo == 1 ? "mdi-check-circle" : "mdi-close-circle" }}
+          </v-icon>
         </template>
 
         <template v-slot:item.beca="{ item }">
-            <v-icon :color="item.beca == 1 ? 'success' : 'grey'" size="small">
-                {{ item.beca == 1 ? 'mdi-check-circle' : 'mdi-close-circle' }}
-            </v-icon>
+          <v-icon :color="item.beca == 1 ? 'success' : 'grey'" size="small">
+            {{ item.beca == 1 ? "mdi-check-circle" : "mdi-close-circle" }}
+          </v-icon>
         </template>
 
         <template v-slot:item.tiene_hijos="{ item }">
-            <v-icon :color="item.tiene_hijos == 1 ? 'success' : 'grey'" size="small">
-                {{ item.tiene_hijos == 1 ? 'mdi-check-circle' : 'mdi-close-circle' }}
-            </v-icon>
+          <v-icon
+            :color="item.tiene_hijos == 1 ? 'success' : 'grey'"
+            size="small"
+          >
+            {{
+              item.tiene_hijos == 1 ? "mdi-check-circle" : "mdi-close-circle"
+            }}
+          </v-icon>
         </template>
-    </v-data-table>
-</v-card>
+
+        <template v-slot:item.detalle="{ item }">
+          <v-btn
+            size="small"
+            color="teal"
+            variant="tonal"
+            icon="mdi-eye"
+            @click="verDetalle(item.id)"
+          ></v-btn>
+        </template>
+      </v-data-table>
+    </v-card>
 
     <v-dialog v-model="dialog" persistent width="auto">
       <CrearUsuario @cerrar="cerrar" />
@@ -310,6 +331,136 @@
       <EditarAdmin @cerrar="cerrarAdmin" :id="idAdmin" />
     </v-dialog>
   </div>
+  <v-dialog v-model="dialogDetalle" max-width="700" scrollable>
+    <v-card v-if="alumnoDetalle && !loadingDetalle">
+        <!-- Header -->
+        <v-card-title class="d-flex align-center justify-space-between">
+            <span>
+                <v-icon color="teal" class="mr-2">mdi-account-details</v-icon>
+                {{ alumnoDetalle.info.nombre }} {{ alumnoDetalle.info.apellido }}
+            </span>
+            <v-btn icon="mdi-close" variant="text" @click="dialogDetalle = false"></v-btn>
+        </v-card-title>
+
+        <v-card-text>
+            <!-- Info general -->
+            <v-row class="mb-3">
+                <v-col cols="6" md="3">
+                    <div class="text-caption text-grey">Institución</div>
+                    <div class="font-weight-bold">{{ alumnoDetalle.info.institucion }}</div>
+                </v-col>
+                <v-col cols="6" md="3">
+                    <div class="text-caption text-grey">Carrera</div>
+                    <div class="font-weight-bold">{{ alumnoDetalle.info.carrera }}</div>
+                </v-col>
+                <v-col cols="6" md="3">
+                    <div class="text-caption text-grey">Semestre</div>
+                    <div class="font-weight-bold">{{ alumnoDetalle.info.semestre }}</div>
+                </v-col>
+                <v-col cols="6" md="3">
+                    <div class="text-caption text-grey">Promedio</div>
+                    <div class="font-weight-bold">{{ alumnoDetalle.info.promedio_anterior }}</div>
+                </v-col>
+            </v-row>
+
+            <v-divider class="mb-4"></v-divider>
+
+            <!-- Puntaje total -->
+            <div class="d-flex align-center justify-center mb-4 gap-4">
+                <div class="text-center">
+                    <div class="text-h3 font-weight-bold">{{ alumnoDetalle.puntaje_total }}</div>
+                    <div class="text-caption text-grey">Puntaje DASS-21</div>
+                </div>
+                <v-chip
+                    :color="alumnoDetalle.nivel_ansiedad === 'Alto' ? 'error' : alumnoDetalle.nivel_ansiedad === 'Medio' ? 'warning' : 'success'"
+                    size="x-large"
+                >
+                    Ansiedad {{ alumnoDetalle.nivel_ansiedad }}
+                </v-chip>
+            </div>
+
+            <!-- Respuestas DASS-21 -->
+            <div class="text-subtitle-2 mb-3">
+                <v-icon size="small" class="mr-1">mdi-format-list-checks</v-icon>
+                Respuestas DASS-21
+            </div>
+
+            <div
+                v-for="(resp, index) in alumnoDetalle.respuestas"
+                :key="resp.id"
+                class="mb-3"
+            >
+                <div class="d-flex justify-space-between align-center mb-1">
+                    <span class="text-caption" style="max-width: 75%">
+                        <strong>P{{ index + 1 }}.</strong> {{ resp.pregunta }}
+                    </span>
+                    <v-chip :color="colorRespuesta(resp.valor)" size="small">
+                        {{ etiquetaRespuesta(resp.valor) }}
+                    </v-chip>
+                </div>
+                <v-progress-linear
+                    :model-value="(resp.valor / 3) * 100"
+                    :color="colorRespuesta(resp.valor)"
+                    height="8"
+                    rounded
+                ></v-progress-linear>
+            </div>
+
+            <v-divider class="my-4"></v-divider>
+
+            <!-- Factores contextuales -->
+            <div class="text-subtitle-2 mb-3">
+                <v-icon size="small" class="mr-1">mdi-clipboard-list</v-icon>
+                Factores Contextuales
+            </div>
+            <v-row>
+                <v-col cols="6" md="4">
+                    <v-chip :color="alumnoDetalle.info.trabajo == 1 ? 'orange' : 'grey'" size="small" class="mb-1">
+                        <v-icon start>{{ alumnoDetalle.info.trabajo == 1 ? 'mdi-check' : 'mdi-close' }}</v-icon>
+                        Trabaja
+                    </v-chip>
+                </v-col>
+                <v-col cols="6" md="4">
+                    <v-chip :color="alumnoDetalle.info.beca == 1 ? 'blue' : 'grey'" size="small" class="mb-1">
+                        <v-icon start>{{ alumnoDetalle.info.beca == 1 ? 'mdi-check' : 'mdi-close' }}</v-icon>
+                        Beca
+                    </v-chip>
+                </v-col>
+                <v-col cols="6" md="4">
+                    <v-chip :color="alumnoDetalle.info.tiene_hijos == 1 ? 'purple' : 'grey'" size="small" class="mb-1">
+                        <v-icon start>{{ alumnoDetalle.info.tiene_hijos == 1 ? 'mdi-check' : 'mdi-close' }}</v-icon>
+                        Tiene hijos
+                    </v-chip>
+                </v-col>
+                <v-col cols="6" md="4">
+                    <v-chip color="teal" size="small" class="mb-1">
+                        <v-icon start>mdi-sleep</v-icon>
+                        Sueño cat. {{ alumnoDetalle.info.horas_sueno }}
+                    </v-chip>
+                </v-col>
+                <v-col cols="6" md="4">
+                    <v-chip color="indigo" size="small" class="mb-1">
+                        <v-icon start>mdi-school</v-icon>
+                        {{ alumnoDetalle.info.maestros_estrictos }} maestros estrictos
+                    </v-chip>
+                </v-col>
+                <v-col cols="6" md="4">
+                    <v-chip color="brown" size="small" class="mb-1">
+                        <v-icon start>mdi-currency-usd</v-icon>
+                        Ingreso cat. {{ alumnoDetalle.info.ingreso_mensual }}
+                    </v-chip>
+                </v-col>
+            </v-row>
+        </v-card-text>
+    </v-card>
+
+    <!-- Loading -->
+    <v-card v-else>
+        <v-card-text class="d-flex justify-center align-center" style="height: 200px">
+            <v-progress-circular indeterminate color="teal"></v-progress-circular>
+        </v-card-text>
+    </v-card>
+</v-dialog>
 </template>
 
 <script setup>
@@ -319,50 +470,79 @@ import CrearUsuario from "@/components/main/CrearUsuario.vue";
 import EditarAlumno from "@/components/main/EditarAlumno.vue";
 import EditarAdmin from "@/components/main/EditarAdmin.vue";
 
-const API_URL = import.meta.env.VITE_MODEL_ENDPOINT || 'https://anxitech-model.onrender.com';
+const API_URL =
+  import.meta.env.VITE_MODEL_ENDPOINT || "https://anxitech-model.onrender.com";
 const usuarioStore = useUsuarioStore();
 const alumnosFactores = ref([]);
 const loadingFactores = ref(true);
-const filtroInstitucion = ref('');
-const filtroNivel = ref('');
-
+const filtroInstitucion = ref("");
+const filtroNivel = ref("");
 
 const headersFactores = ref([
-    { title: 'Nombre', key: 'nombre', sortable: true },
-    { title: 'Apellido', key: 'apellido', sortable: true },
-    { title: 'Institución', key: 'institucion', sortable: true },
-    { title: 'Carrera', key: 'carrera', sortable: true },
-    { title: 'Semestre', key: 'semestre', sortable: true },
-    { title: 'Promedio', key: 'promedio_anterior', sortable: true },
-    { title: 'Materias', key: 'materias', sortable: true },
-    { title: 'Trabaja', key: 'trabajo', sortable: true },
-    { title: 'Beca', key: 'beca', sortable: true },
-    { title: 'Hijos', key: 'tiene_hijos', sortable: true },
-    { title: 'Maestros', key: 'maestros_estrictos', sortable: true },
-    { title: 'DASS-21', key: 'puntaje_dass21', sortable: true },
-    { title: 'Nivel', key: 'nivel_ansiedad', sortable: true },
+  { title: "Nombre", key: "nombre", sortable: true },
+  { title: "Apellido", key: "apellido", sortable: true },
+  { title: "Institución", key: "institucion", sortable: true },
+  { title: "Carrera", key: "carrera", sortable: true },
+  { title: "Semestre", key: "semestre", sortable: true },
+  { title: "Promedio", key: "promedio_anterior", sortable: true },
+  { title: "Materias", key: "materias", sortable: true },
+  { title: "Trabaja", key: "trabajo", sortable: true },
+  { title: "Beca", key: "beca", sortable: true },
+  { title: "Hijos", key: "tiene_hijos", sortable: true },
+  { title: "Maestros", key: "maestros_estrictos", sortable: true },
+  { title: "DASS-21", key: "puntaje_dass21", sortable: true },
+  { title: "Nivel", key: "nivel_ansiedad", sortable: true },
+  { title: "Detalle", key: "detalle", sortable: false },
 ]);
 
-
 const alumnosFiltrados = computed(() => {
-    return alumnosFactores.value.filter(a => {
-        const coincideInstitucion = !filtroInstitucion.value || a.institucion === filtroInstitucion.value;
-        const coincideNivel = !filtroNivel.value || a.nivel_ansiedad === filtroNivel.value;
-        return coincideInstitucion && coincideNivel;
-    });
+  return alumnosFactores.value.filter((a) => {
+    const coincideInstitucion =
+      !filtroInstitucion.value || a.institucion === filtroInstitucion.value;
+    const coincideNivel =
+      !filtroNivel.value || a.nivel_ansiedad === filtroNivel.value;
+    return coincideInstitucion && coincideNivel;
+  });
 });
 
 const cargarFactoresAlumno = async () => {
-    try {
-        loadingFactores.value = true;
-        const response = await fetch(`${API_URL}/api/stats/por-alumno`);
-        const data = await response.json();
-        alumnosFactores.value = data.alumnos;
-    } catch (err) {
-        console.error('Error factores alumno:', err);
-    } finally {
-        loadingFactores.value = false;
-    }
+  try {
+    loadingFactores.value = true;
+    const response = await fetch(`${API_URL}/api/stats/por-alumno`);
+    const data = await response.json();
+    alumnosFactores.value = data.alumnos;
+  } catch (err) {
+    console.error("Error factores alumno:", err);
+  } finally {
+    loadingFactores.value = false;
+  }
+};
+
+const dialogDetalle = ref(false);
+const alumnoDetalle = ref(null);
+const loadingDetalle = ref(false);
+
+const verDetalle = async (id) => {
+  loadingDetalle.value = true;
+  dialogDetalle.value = true;
+  try {
+    const response = await fetch(
+      `https://anxitech-model.onrender.com/api/stats/alumno/${id}`,
+    );
+    alumnoDetalle.value = await response.json();
+  } catch (err) {
+    console.error("Error detalle:", err);
+  } finally {
+    loadingDetalle.value = false;
+  }
+};
+
+const etiquetaRespuesta = (valor) => {
+  return ["Nunca", "A veces", "A menudo", "Casi siempre"][valor] || valor;
+};
+
+const colorRespuesta = (valor) => {
+  return ["success", "info", "warning", "error"][valor] || "grey";
 };
 
 // 🔥 Estados de diálogos
@@ -466,7 +646,7 @@ const getAdmins = async () => {
   const adminsJson = await (
     await fetch(import.meta.env.VITE_ENDPOINT + "users.php?action=getAdmins")
   ).json();
-  
+
   const filteredAdmins = adminsJson.data.filter((item) => {
     if (item.id === usuarioStore.getId()) {
       return false;
@@ -479,7 +659,7 @@ const getAdmins = async () => {
     }
     return true;
   });
-  
+
   admins.value = filteredAdmins;
   sizeAdmins.value = filteredAdmins.length; // 🔥 Total de admins
   loadingAdmins.value = false;
@@ -509,7 +689,7 @@ const removeAlumno = async (id) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ id: id }),
-        }
+        },
       )
     ).json();
 
@@ -541,7 +721,7 @@ const removeAdmin = async (id) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ id: id }),
-        }
+        },
       )
     ).json();
 
@@ -610,7 +790,9 @@ const exportarCSV = async () => {
       ...json.data.map((row) => campos.map((c) => escapeCSV(row[c])).join(",")),
     ];
 
-    const blob = new Blob(["﻿" + filas.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const blob = new Blob(["﻿" + filas.join("\n")], {
+      type: "text/csv;charset=utf-8;",
+    });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = `dataset_dass21_${new Date().toISOString().slice(0, 10)}.csv`;
@@ -629,7 +811,6 @@ onMounted(() => {
   getAlumnos({ page: 1, itemsPerPage: itemsPerPage.value });
   getAdmins();
   cargarFactoresAlumno(); // ← agregar
-
 });
 </script>
 
